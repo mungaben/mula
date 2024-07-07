@@ -1,3 +1,5 @@
+"use client"
+
 // components/RegisterForm.tsx
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/router';
