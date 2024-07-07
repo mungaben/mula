@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  email         String          @unique
+  phone         String?          @unique
+  password      String
+  balance       Float           @default(0.0)
+  role          UserRole        @default(USER)
+  referralLink  String?         @unique
+  referredBy    String?         @db.ObjectId
+  deposits      Deposit[]
+  withdrawals   WithdrawalRequest[]
+  products      UserProduct[]
+  referrals     Referral[]      @relation("Referrer")
+  referred      Referral[]      @relation("Referee")
+  notifications Notification[]
+  promotionCodes PromotionCode[]
+  emailVerified DateTime?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+}
+
+model Product {
+  id                  String          @id @default(auto()) @map("_id") @db.ObjectId
+  name                String
+  price               Float
+  earningPer24Hours   Float
+  subscribersCount    Int             @default(0)
+  userProducts        UserProduct[]
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+}
+
+model Deposit {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String    @db.ObjectId
+  amount    Float
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id])
+}
+
+model WithdrawalRequest {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String    @db.ObjectId
+  amount    Float
+  status    WithdrawalStatus
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User      @relation(fields: [userId], references: [id])
+}
+
+model UserProduct {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String    @db.ObjectId
+  productId String    @db.ObjectId
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id])
+  product   Product   @relation(fields: [productId], references: [id])
+}
+
+model Referral {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  referrerId    String    @db.ObjectId
+  refereeId     String    @db.ObjectId
+  purchaseStatus PurchaseStatus
+  createdAt     DateTime  @default(now())
+  referrer      User      @relation("Referrer", fields: [referrerId], references: [id])
+  referee       User      @relation("Referee", fields: [refereeId], references: [id])
+}
+
+model PromotionCode {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  code      String    @unique
+  price     Float
+  userId    String?   @db.ObjectId
+  createdAt DateTime  @default(now())
+  user      User?     @relation(fields: [userId], references: [id])
+}
+
+model Notification {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String    @db.ObjectId
+  type      NotificationType
+  message   String
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id])
+}
+
+enum UserRole {
+  USER
+  SUBADMIN
+  ADMIN
+}
+
+enum WithdrawalStatus {
+  REQUESTED
+  APPROVED
+  REJECTED
+}
+
+enum PurchaseStatus {
+  PURCHASED
+  NOT_PURCHASED
+}
+
+enum NotificationType {
+  DEPOSIT
+  WITHDRAWAL
+  PURCHASE
+  LOGIN
+}
