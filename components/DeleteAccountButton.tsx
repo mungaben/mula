@@ -1,3 +1,5 @@
+
+"use client"
 // components/DeleteAccountButton.tsx
 
 import axios from 'axios';
