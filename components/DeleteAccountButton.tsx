@@ -3,8 +3,9 @@
 // components/DeleteAccountButton.tsx
 
 import axios from 'axios';
-import { useRouter } from 'next/router';
+
 import { Button } from './ui/button';
+import { useRouter } from 'next/navigation';
 
 export default function DeleteAccountButton() {
   const router = useRouter();

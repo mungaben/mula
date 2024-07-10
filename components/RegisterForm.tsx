@@ -2,10 +2,11 @@
 
 // components/RegisterForm.tsx
 import { useForm } from 'react-hook-form';
-import { useRouter } from 'next/router';
+
 import axios from 'axios';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+import { useRouter } from 'next/navigation';
 
 
 type RegisterFormData = {
