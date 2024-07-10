@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { z } from "zod";
 
 const prisma = new PrismaClient();
 
@@ -72,13 +71,37 @@ export async function POST(req: NextRequest) {
     }
 
     if (type === 'received') {
+      // Check for matching awaiting deposit
+      const awaitingDeposit = await prisma.awaitingDeposit.findFirst({
+        where: {
+          userId: user.id,
+          amount,
+          simPhoneNumber: { phoneNumber: sim },
+          status: 'PENDING',
+          initiatedAt: {
+            gte: new Date(new Date().getTime() - 3 * 60 * 60 * 1000) // within the last 3 hours
+          }
+        }
+      });
+
+      if (!awaitingDeposit) {
+        return NextResponse.json({ error: "No matching awaiting deposit found" }, { status: 404 });
+      }
+
+      // Mark awaiting deposit as fulfilled
+      await prisma.awaitingDeposit.update({
+        where: { id: awaitingDeposit.id },
+        data: { status: 'FULFILLED' }
+      });
+
       // Handle deposit
       await prisma.deposit.create({
         data: {
           userId: user.id,
           amount,
           createdAt: new Date(receivedStamp),
-          simPhoneNumberId: sim, // Include simPhoneNumberId
+          simPhoneNumberId: sim,
+          status: 'FULFILLED',
         },
       });
 
@@ -88,21 +111,30 @@ export async function POST(req: NextRequest) {
         data: { balance: { increment: amount } },
       });
 
-      return NextResponse.json({ message: "Deposit recorded and balance updated successfully" }, { status: 200 });
-
-    } else if (type === 'sent') {
-      // Handle withdrawal
-      const withdrawal = await prisma.withdrawalRequest.create({
-        data: {
+      // Credit pending commissions
+      const pendingCommissions = await prisma.commission.findMany({
+        where: {
           userId: user.id,
-          amount,
-          status: 'APPROVED',
-          createdAt: new Date(receivedStamp),
-          simPhoneNumberId: sim, // Ensure this field is included
+          pending: true,
         },
       });
 
-      // Update user balance
+      for (const commission of pendingCommissions) {
+        await prisma.user.update({
+          where: { id: commission.referrerId },
+          data: { balance: { increment: commission.amount } },
+        });
+
+        await prisma.commission.update({
+          where: { id: commission.id },
+          data: { pending: false },
+        });
+      }
+
+      return NextResponse.json({ message: "Deposit recorded and balance updated successfully" }, { status: 200 });
+
+    } else if (type === 'sent') {
+      // Update user balance to reflect withdrawal
       await prisma.user.update({
         where: { id: user.id },
         data: { balance: { decrement: amount } },

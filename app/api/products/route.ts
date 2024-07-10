@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { name, price, earningPer24Hours } = await req.json();
+    const { name, price, earningPer24Hours,growthPercentage } = await req.json();
 
     // Validate input
     if (!name || !price || !earningPer24Hours) {
@@ -57,6 +57,7 @@ export async function POST(req: NextRequest) {
         name,
         price,
         earningPer24Hours,
+        growthPercentage
       },
     });
 

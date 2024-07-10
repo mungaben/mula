@@ -22,8 +22,10 @@ model User {
   products            UserProduct[]
   referrals           Referral[]          @relation("Referrer")
   referred            Referral[]          @relation("Referee")
+  promotionRequests   PromotionRequest[]
   notifications       Notification[]
   promotionCodes      PromotionCode[]
+  awaitingDeposits    AwaitingDeposit[]
   interests           Interest[]
   commissionsReceived Commission[]        @relation("User_CommissionsReceived")
   commissionsGiven    Commission[]        @relation("User_CommissionsGiven")
@@ -33,12 +35,21 @@ model User {
   updatedAt           DateTime            @updatedAt
 }
 
+model Config {
+  id                      String  @id @default(auto()) @map("_id") @db.ObjectId
+  minWithdrawalAmount     Float
+  withdrawalFeePercentage Float
+  minBalance              Float
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+}
 model SimPhoneNumber {
-  id          String              @id @default(auto()) @map("_id") @db.ObjectId
-  phoneNumber String              @unique
+  id          String         @id @default(auto()) @map("_id") @db.ObjectId
+  phoneNumber String         @unique
   description String
-  createdAt   DateTime            @default(now())
+  createdAt   DateTime       @default(now())
   deposits    Deposit[]
+  awaitingDeposits AwaitingDeposit[]
   withdrawals WithdrawalRequest[]
 }
 
@@ -50,6 +61,7 @@ model Deposit {
   createdAt        DateTime       @default(now())
   user             User           @relation(fields: [userId], references: [id])
   simPhoneNumber   SimPhoneNumber @relation(fields: [simPhoneNumberId], references: [id])
+  status           DepositStatus  @default(PENDING)
 }
 
 model WithdrawalRequest {
@@ -57,12 +69,13 @@ model WithdrawalRequest {
   userId           String           @db.ObjectId
   simPhoneNumberId String           @db.ObjectId
   amount           Float
-  status           WithdrawalStatus
+  status           WithdrawalStatus @default(REQUESTED)
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
   user             User             @relation(fields: [userId], references: [id])
   simPhoneNumber   SimPhoneNumber   @relation(fields: [simPhoneNumberId], references: [id])
 }
+
 
 model Product {
   id                String        @id @default(auto()) @map("_id") @db.ObjectId
@@ -87,13 +100,15 @@ model UserProduct {
 }
 
 model Referral {
-  id             String         @id @default(auto()) @map("_id") @db.ObjectId
-  referrerId     String         @db.ObjectId
-  refereeId      String         @db.ObjectId
-  purchaseStatus PurchaseStatus
-  createdAt      DateTime       @default(now())
-  referrer       User           @relation("Referrer", fields: [referrerId], references: [id])
-  referee        User           @relation("Referee", fields: [refereeId], references: [id])
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  referrerId     String   @db.ObjectId
+  refereeId      String?  @db.ObjectId  // This should be optional as it will be set later
+  level          Int      // Referral level (1, 2, or 3)
+  percentage     Float    // Commission percentage for this level
+  linkLifetime   DateTime // Expiration date for the referral link
+  createdAt      DateTime @default(now())
+  referrer       User     @relation("Referrer", fields: [referrerId], references: [id])
+  referee        User?    @relation("Referee", fields: [refereeId], references: [id])
 }
 
 model PromotionCode {
@@ -130,6 +145,8 @@ model Commission {
   userId     String   @db.ObjectId
   referrerId String   @db.ObjectId
   amount     Float
+  level      Int      // Referral level (1, 2, or 3)
+  pending    Boolean  @default(true) // Indicates if the commission is pending
   createdAt  DateTime @default(now())
   user       User     @relation("User_CommissionsReceived", fields: [userId], references: [id])
   referrer   User     @relation("User_CommissionsGiven", fields: [referrerId], references: [id])
@@ -144,8 +161,38 @@ model SpecialCode {
   userId        String?  @db.ObjectId
   createdAt     DateTime @default(now())
   expiresAt     DateTime
-  User          User?    @relation(fields: [userId], references: [id])
+  user          User?    @relation(fields: [userId], references: [id])
 }
+
+model PromotionRequest {
+  id             String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String     @db.ObjectId
+  status         String     @default("PENDING") // PENDING, APPROVED, REJECTED
+  roleRequested  UserRole
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  user           User       @relation(fields: [userId], references: [id])
+}
+
+
+model AwaitingDeposit {
+  id               String      @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String      @db.ObjectId
+  simPhoneNumberId String      @db.ObjectId
+  amount           Float
+  initiatedAt      DateTime    @default(now())
+  status           DepositStatus @default(PENDING)
+  user             User        @relation(fields: [userId], references: [id])
+  simPhoneNumber   SimPhoneNumber @relation(fields: [simPhoneNumberId], references: [id])
+}
+
+enum DepositStatus {
+  PENDING
+  FULFILLED
+  EXPIRED
+
+}
+
 
 enum UserRole {
   USER
