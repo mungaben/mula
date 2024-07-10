@@ -8,91 +8,143 @@ datasource db {
 }
 
 model User {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  name          String
-  email         String          @unique
-  phone         String?          @unique
-  password      String
-  balance       Float           @default(0.0)
-  role          UserRole        @default(USER)
-  referralLink  String?         @unique
-  referredBy    String?         @db.ObjectId
-  deposits      Deposit[]
-  withdrawals   WithdrawalRequest[]
-  products      UserProduct[]
-  referrals     Referral[]      @relation("Referrer")
-  referred      Referral[]      @relation("Referee")
-  notifications Notification[]
-  promotionCodes PromotionCode[]
-  emailVerified DateTime?
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+  id                  String              @id @default(auto()) @map("_id") @db.ObjectId
+  name                String
+  email               String              @unique
+  phone               String?             @unique
+  password            String
+  balance             Float               @default(0.0)
+  role                UserRole            @default(USER)
+  referralLink        String?             @unique
+  referredBy          String?             @db.ObjectId
+  deposits            Deposit[]
+  withdrawals         WithdrawalRequest[]
+  products            UserProduct[]
+  referrals           Referral[]          @relation("Referrer")
+  referred            Referral[]          @relation("Referee")
+  notifications       Notification[]
+  promotionCodes      PromotionCode[]
+  interests           Interest[]
+  commissionsReceived Commission[]        @relation("User_CommissionsReceived")
+  commissionsGiven    Commission[]        @relation("User_CommissionsGiven")
+  specialCodes        SpecialCode[]
+  emailVerified       DateTime?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
 }
 
-model Product {
-  id                  String          @id @default(auto()) @map("_id") @db.ObjectId
-  name                String
-  price               Float
-  earningPer24Hours   Float
-  subscribersCount    Int             @default(0)
-  userProducts        UserProduct[]
-  createdAt           DateTime        @default(now())
-  updatedAt           DateTime        @updatedAt
+model SimPhoneNumber {
+  id          String              @id @default(auto()) @map("_id") @db.ObjectId
+  phoneNumber String              @unique
+  description String
+  createdAt   DateTime            @default(now())
+  deposits    Deposit[]
+  withdrawals WithdrawalRequest[]
 }
 
 model Deposit {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String    @db.ObjectId
-  amount    Float
-  createdAt DateTime  @default(now())
-  user      User      @relation(fields: [userId], references: [id])
+  id               String         @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String         @db.ObjectId
+  simPhoneNumberId String         @db.ObjectId
+  amount           Float
+  createdAt        DateTime       @default(now())
+  user             User           @relation(fields: [userId], references: [id])
+  simPhoneNumber   SimPhoneNumber @relation(fields: [simPhoneNumberId], references: [id])
 }
 
 model WithdrawalRequest {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String    @db.ObjectId
-  amount    Float
-  status    WithdrawalStatus
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  user      User      @relation(fields: [userId], references: [id])
+  id               String           @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String           @db.ObjectId
+  simPhoneNumberId String           @db.ObjectId
+  amount           Float
+  status           WithdrawalStatus
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  user             User             @relation(fields: [userId], references: [id])
+  simPhoneNumber   SimPhoneNumber   @relation(fields: [simPhoneNumberId], references: [id])
+}
+
+model Product {
+  id                String        @id @default(auto()) @map("_id") @db.ObjectId
+  name              String
+  price             Float
+  earningPer24Hours Float
+  growthPercentage  Float // Added to store growth percentage
+  subscribersCount  Int           @default(0)
+  userProducts      UserProduct[]
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @default(now()) @updatedAt
 }
 
 model UserProduct {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String    @db.ObjectId
-  productId String    @db.ObjectId
-  createdAt DateTime  @default(now())
-  user      User      @relation(fields: [userId], references: [id])
-  product   Product   @relation(fields: [productId], references: [id])
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String     @db.ObjectId
+  productId String     @db.ObjectId
+  createdAt DateTime   @default(now())
+  user      User       @relation(fields: [userId], references: [id])
+  product   Product    @relation(fields: [productId], references: [id])
+  interests Interest[]
 }
 
 model Referral {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  referrerId    String    @db.ObjectId
-  refereeId     String    @db.ObjectId
+  id             String         @id @default(auto()) @map("_id") @db.ObjectId
+  referrerId     String         @db.ObjectId
+  refereeId      String         @db.ObjectId
   purchaseStatus PurchaseStatus
-  createdAt     DateTime  @default(now())
-  referrer      User      @relation("Referrer", fields: [referrerId], references: [id])
-  referee       User      @relation("Referee", fields: [refereeId], references: [id])
+  createdAt      DateTime       @default(now())
+  referrer       User           @relation("Referrer", fields: [referrerId], references: [id])
+  referee        User           @relation("Referee", fields: [refereeId], references: [id])
 }
 
 model PromotionCode {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  code      String    @unique
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  code      String   @unique
   price     Float
-  userId    String?   @db.ObjectId
-  createdAt DateTime  @default(now())
-  user      User?     @relation(fields: [userId], references: [id])
+  userId    String?  @db.ObjectId
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  user      User?    @relation(fields: [userId], references: [id])
 }
 
 model Notification {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String    @db.ObjectId
+  id        String           @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String           @db.ObjectId
   type      NotificationType
   message   String
-  createdAt DateTime  @default(now())
-  user      User      @relation(fields: [userId], references: [id])
+  createdAt DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [id])
+}
+
+model Interest {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String      @db.ObjectId
+  userProductId String      @db.ObjectId
+  amount        Float
+  createdAt     DateTime    @default(now())
+  user          User        @relation(fields: [userId], references: [id])
+  userProduct   UserProduct @relation(fields: [userProductId], references: [id])
+}
+
+model Commission {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String   @db.ObjectId
+  referrerId String   @db.ObjectId
+  amount     Float
+  createdAt  DateTime @default(now())
+  user       User     @relation("User_CommissionsReceived", fields: [userId], references: [id])
+  referrer   User     @relation("User_CommissionsGiven", fields: [referrerId], references: [id])
+}
+
+model SpecialCode {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  code          String   @unique
+  totalAmount   Float // Total redeemable amount
+  redeemAmount  Float // Amount each user gets
+  currentAmount Float    @default(0.0) // Track how much has been redeemed
+  userId        String?  @db.ObjectId
+  createdAt     DateTime @default(now())
+  expiresAt     DateTime
+  User          User?    @relation(fields: [userId], references: [id])
 }
 
 enum UserRole {

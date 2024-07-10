@@ -34,5 +34,6 @@ export const config = {
     '/user/:path*',
     '/profile/:path*',
     '/api/protected/:path*',
+    '/api/Users'
   ],
 };

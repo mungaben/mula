@@ -1,9 +1,7 @@
 
 
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth/next";
 import { NextRequest, NextResponse } from "next/server";
-import { authOptions } from "../auth/[...nextauth]/route";
 import { getToken } from "next-auth/jwt";
 
 
