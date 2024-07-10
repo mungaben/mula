@@ -4,8 +4,21 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Alert } from '@/components/ui/alert';
 
+type Referral = {
+  id: string;
+  referrer: {
+    name: string;
+  };
+  referee?: {
+    name: string;
+  };
+  level: number;
+  percentage: number;
+  linkLifetime: string;
+};
+
 export function ViewReferrals() {
-  const [referrals, setReferrals] = useState([]);
+  const [referrals, setReferrals] = useState<Referral[]>([]);
   const [message, setMessage] = useState('');
 
   const fetchReferrals = async () => {
