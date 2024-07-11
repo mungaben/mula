@@ -1,5 +1,3 @@
-// /app/api/cron/route.ts
-
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
@@ -44,13 +42,11 @@ async function calculateInterest() {
 }
 
 export async function GET(req: NextRequest) {
-  // Authorization check
   const authorizationHeader = req.headers.get('Authorization');
   if (!authorizationHeader || authorizationHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  // Run the interest calculation script
   await calculateInterest();
   return NextResponse.json({ message: 'Interest calculation triggered successfully' });
 }
