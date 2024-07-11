@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, DepositStatus } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
 
   console.log("body from sms", { body });
 
-  const sms: SmsBody = body.body;
+  const sms: SmsBody = body;
 
   if (!sms) {
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
@@ -77,31 +77,31 @@ export async function POST(req: NextRequest) {
           userId: user.id,
           amount,
           simPhoneNumber: { phoneNumber: sim },
-          status: 'PENDING',
+          status: DepositStatus.PENDING,
           initiatedAt: {
             gte: new Date(new Date().getTime() - 3 * 60 * 60 * 1000) // within the last 3 hours
           }
         }
       });
 
-      if (!awaitingDeposit) {
-        return NextResponse.json({ error: "No matching awaiting deposit found" }, { status: 404 });
+      let depositStatus: DepositStatus = DepositStatus.NOT_PREINITIATED_FULFILLED;
+      if (awaitingDeposit) {
+        // Mark awaiting deposit as fulfilled
+        await prisma.awaitingDeposit.update({
+          where: { id: awaitingDeposit.id },
+          data: { status: DepositStatus.FULFILLED }
+        });
+        depositStatus = DepositStatus.FULFILLED;
       }
 
-      // Mark awaiting deposit as fulfilled
-      await prisma.awaitingDeposit.update({
-        where: { id: awaitingDeposit.id },
-        data: { status: 'FULFILLED' }
-      });
-
-      // Handle deposit
+      // Record the deposit
       await prisma.deposit.create({
         data: {
           userId: user.id,
           amount,
           createdAt: new Date(receivedStamp),
           simPhoneNumberId: sim,
-          status: 'FULFILLED',
+          status: depositStatus,
         },
       });
 

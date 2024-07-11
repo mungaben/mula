@@ -43,6 +43,7 @@ model Config {
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt
 }
+
 model SimPhoneNumber {
   id          String         @id @default(auto()) @map("_id") @db.ObjectId
   phoneNumber String         @unique
@@ -75,7 +76,6 @@ model WithdrawalRequest {
   user             User             @relation(fields: [userId], references: [id])
   simPhoneNumber   SimPhoneNumber   @relation(fields: [simPhoneNumberId], references: [id])
 }
-
 
 model Product {
   id                String        @id @default(auto()) @map("_id") @db.ObjectId
@@ -174,7 +174,6 @@ model PromotionRequest {
   user           User       @relation(fields: [userId], references: [id])
 }
 
-
 model AwaitingDeposit {
   id               String      @id @default(auto()) @map("_id") @db.ObjectId
   userId           String      @db.ObjectId
@@ -190,9 +189,8 @@ enum DepositStatus {
   PENDING
   FULFILLED
   EXPIRED
-
+  NOT_PREINITIATED_FULFILLED
 }
-
 
 enum UserRole {
   USER
