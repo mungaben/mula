@@ -51,6 +51,10 @@ export const createSpecialCode = async (data: z.infer<typeof specialCodeSchema>)
 
 // Validate a special code
 export const validateSpecialCode = async (code: string) => {
+
+
+  console.log("code",code);
+  
   const specialCode = await prisma.specialCode.findUnique({
     where: { code },
   });
@@ -72,7 +76,12 @@ export const validateSpecialCode = async (code: string) => {
 
 // Redeem a special code
 export const redeemSpecialCode = async (data: z.infer<typeof redeemCodeSchema>) => {
+
+  console.log("edeemSpecialCode",data);
+  
   redeemCodeSchema.parse(data); // Validate input data
+
+
 
   const { code, userId } = data;
   const specialCode = await validateSpecialCode(code);

@@ -12,3 +12,27 @@ export const redeemCodeSchema = z.object({
   code: z.string(),
   userId: z.string(),
 });
+
+export const referralLinkSchema = z.object({
+  userId: z.string(),
+});
+
+
+
+// types.ts
+export type ModuleState = {
+  depositModule: boolean;
+  withdrawModule: boolean;
+  redeemCodeModule: boolean;
+  referralLinkModule:boolean;
+};
+
+export type ModuleActions = {
+  toggleDepositModule: () => void;
+  toggleWithdrawModule: () => void;
+  toggleRedeemCodeModule: () => void;
+  toggleReferralLinkModule:() => void;
+};
+
+export type ModuleStore = ModuleState & ModuleActions;
+

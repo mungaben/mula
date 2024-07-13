@@ -1,73 +1,158 @@
 "use client";
 
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert } from '@/components/ui/alert';
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import toast from "react-hot-toast";
+import useModuleStore from "@/lib/storage/modules";
+import { useSession } from "next-auth/react";
 
-type GenerateReferralFormData = {
-  userId: string;
-  level1Percentage: number;
-  level2Percentage: number;
-  level3Percentage: number;
-  linkLifetime: number; // in days
-};
+interface User {
+  id: string;
+  email: string;
+  name?: string;
+}
 
-export function GenerateReferralLink() {
-  const [message, setMessage] = useState('');
-  const { register, handleSubmit, formState: { errors } } = useForm<GenerateReferralFormData>();
+interface ReferralLinkProps {
+  user?: User;
+}
 
-  const onSubmit = async (data: GenerateReferralFormData) => {
+interface Referee {
+  name: string;
+  email: string;
+}
+
+export function ReferralLinkModal({ user }: ReferralLinkProps) {
+  const { referralLinkModule, toggleReferralLinkModule } = useModuleStore();
+  const [referralLink, setReferralLink] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [referees, setReferees] = useState<Referee[]>([]);
+
+  useEffect(() => {
+    if (user?.id) {
+      fetchReferees();
+    }
+  }, [user]);
+
+  const fetchReferees = async () => {
     try {
-      const response = await fetch('/api/referral', {
-        method: 'POST',
+      const response = await fetch(`/api/referral?userId=${user?.id}`);
+      const result = await response.json();
+      if (response.ok) {
+        setReferees(result.referees);
+      } else {
+        toast.error(result.error || "Failed to fetch referees.");
+      }
+    } catch (err) {
+      toast.error("An error occurred while fetching referees.");
+    }
+  };
+
+  const handleGenerateLink = async () => {
+    if (!user?.id) {
+      toast.error("User not authenticated.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch("/api/referral", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ userId: user.id }),
       });
 
       const result = await response.json();
 
       if (response.ok) {
-        setMessage(`Referral link generated: ${result.referralLink}`);
+        setReferralLink(result.referralLink);
+        toast.success("Referral link generated successfully!");
       } else {
-        setMessage(`Error: ${result.error}`);
+        toast.error(result.error || "Failed to generate referral link.");
       }
-    } catch (error) {
-      setMessage('Error generating referral link.');
+    } catch (err) {
+      toast.error("An error occurred while generating the referral link.");
+    } finally {
+      setLoading(false);
     }
   };
 
+  const handleCopyLink = () => {
+    if (referralLink) {
+      const fullReferralLink = `${window.location.origin}/auth/signup?referral=${referralLink}`;
+      navigator.clipboard.writeText(fullReferralLink);
+      toast.success("Referral link copied to clipboard!");
+    }
+  };
+  
+
   return (
-    <div>
-      <h1>Generate Referral Link</h1>
-      {message && <Alert>{message}</Alert>}
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div>
-          <Label>User ID</Label>
-          <Input {...register('userId')} required />
+    <Dialog open={referralLinkModule} onOpenChange={toggleReferralLinkModule}>
+      <DialogTrigger>Generate Referral Link</DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Generate Referral Link</DialogTitle>
+          <DialogDescription>
+            Generate and copy your referral link.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex flex-col gap-4">
+          {referralLink ? (
+            <div>
+              <Label htmlFor="referralLink">Your Referral Link</Label>
+              <div className="flex items-center gap-2">
+                <input
+                  id="referralLink"
+                  type="text"
+                  value={`${window.location.origin}/auth/signup?referral=${referralLink}`}
+                  readOnly
+                  className="input"
+                />
+                <Button type="button" onClick={handleCopyLink}>
+                  Copy
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <Button onClick={handleGenerateLink} disabled={loading}>
+              {loading ? "Generating..." : "Generate Referral Link"}
+            </Button>
+          )}
         </div>
-        <div>
-          <Label>Level 1 Percentage</Label>
-          <Input type="number" {...register('level1Percentage', { valueAsNumber: true })} required />
+        <div className="mt-4">
+          <h3 className="text-lg font-semibold">People who used your referral link</h3>
+          {referees.length > 0 ? (
+            <ul className="list-disc ml-5">
+              {referees.map((referee, index) => (
+                <li key={index}>
+                  {referee.name} ({referee.email})
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No one has used your referral link yet.</p>
+          )}
         </div>
-        <div>
-          <Label>Level 2 Percentage</Label>
-          <Input type="number" {...register('level2Percentage', { valueAsNumber: true })} required />
-        </div>
-        <div>
-          <Label>Level 3 Percentage</Label>
-          <Input type="number" {...register('level3Percentage', { valueAsNumber: true })} required />
-        </div>
-        <div>
-          <Label>Link Lifetime (days)</Label>
-          <Input type="number" {...register('linkLifetime', { valueAsNumber: true })} required />
-        </div>
-        <Button type="submit">Generate Link</Button>
-      </form>
-    </div>
+        <DialogFooter className="sm:justify-start">
+          <DialogClose asChild>
+            <Button type="button" variant={"ghost"}>
+              Close
+            </Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

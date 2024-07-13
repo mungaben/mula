@@ -1,5 +1,3 @@
-// src/app/api/user/[id]/profile.ts
-
 import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -49,6 +47,64 @@ export async function GET(req: NextRequest) {
     };
 
     return NextResponse.json(profile, { status: 200 });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const data = await req.json();
+
+    const newUser = await prisma.user.create({
+      data,
+    });
+
+    return NextResponse.json(newUser, { status: 201 });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function PUT(req: NextRequest) {
+  const { searchParams } = new URL(req.url!);
+  const userId = searchParams.get('id');
+
+  if (!userId) {
+    return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+  }
+
+  try {
+    const data = await req.json();
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data,
+    });
+
+    return NextResponse.json(updatedUser, { status: 200 });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  const { searchParams } = new URL(req.url!);
+  const userId = searchParams.get('id');
+
+  if (!userId) {
+    return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+  }
+
+  try {
+    await prisma.user.delete({
+      where: { id: userId },
+    });
+
+    return NextResponse.json({ message: 'User deleted successfully' }, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

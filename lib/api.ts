@@ -21,6 +21,8 @@ export async function fetchPhoneNumbers() {
 
 
 
+
+
   export async function requestWithdrawal(data: { userId: string; simPhoneNumberId: string; amount: number }) {
     const response = await fetch('/api/withdrawal/request', {
       method: 'POST',
@@ -29,7 +31,9 @@ export async function fetchPhoneNumbers() {
       },
       body: JSON.stringify(data),
     });
+
+    console.log("response",response.json());
+    
   
     return await response.json();
   }
-  

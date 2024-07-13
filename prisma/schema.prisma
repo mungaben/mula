@@ -16,6 +16,7 @@ model User {
   balance             Float               @default(0.0)
   role                UserRole            @default(USER)
   referralLink        String?             @unique
+  referralLinkExpiry  DateTime?
   referredBy          String?             @db.ObjectId
   deposits            Deposit[]
   withdrawals         WithdrawalRequest[]
@@ -33,6 +34,27 @@ model User {
   emailVerified       DateTime?
   createdAt           DateTime            @default(now())
   updatedAt           DateTime            @updatedAt
+  referralLinksUsed   UserReferralLink[]
+}
+
+model Referral {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  referrerId     String   @db.ObjectId
+  refereeId      String?  @db.ObjectId  // This should be optional as it will be set later
+  level          Int      // Referral level (1, 2, or 3)
+  percentage     Float    // Commission percentage for this level
+  linkLifetime   DateTime // Expiration date for the referral link
+  createdAt      DateTime @default(now())
+  referrer       User     @relation("Referrer", fields: [referrerId], references: [id])
+  referee        User?    @relation("Referee", fields: [refereeId], references: [id])
+}
+
+model UserReferralLink {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String   @db.ObjectId
+  referralLink   String
+  usedAt         DateTime @default(now())
+  user           User     @relation(fields: [userId], references: [id])
 }
 
 model Config {
@@ -40,18 +62,22 @@ model Config {
   minWithdrawalAmount     Float
   withdrawalFeePercentage Float
   minBalance              Float
+  level1Percentage        Float
+  level2Percentage        Float
+  level3Percentage        Float
+  linkLifetime            Int // in days
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt
 }
 
 model SimPhoneNumber {
-  id          String         @id @default(auto()) @map("_id") @db.ObjectId
-  phoneNumber String         @unique
-  description String
-  createdAt   DateTime       @default(now())
-  deposits    Deposit[]
+  id               String            @id @default(auto()) @map("_id") @db.ObjectId
+  phoneNumber      String            @unique
+  description      String
+  createdAt        DateTime          @default(now())
+  deposits         Deposit[]
   awaitingDeposits AwaitingDeposit[]
-  withdrawals WithdrawalRequest[]
+  withdrawals      WithdrawalRequest[]
 }
 
 model Deposit {
@@ -97,18 +123,6 @@ model UserProduct {
   user      User       @relation(fields: [userId], references: [id])
   product   Product    @relation(fields: [productId], references: [id])
   interests Interest[]
-}
-
-model Referral {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
-  referrerId     String   @db.ObjectId
-  refereeId      String?  @db.ObjectId  // This should be optional as it will be set later
-  level          Int      // Referral level (1, 2, or 3)
-  percentage     Float    // Commission percentage for this level
-  linkLifetime   DateTime // Expiration date for the referral link
-  createdAt      DateTime @default(now())
-  referrer       User     @relation("Referrer", fields: [referrerId], references: [id])
-  referee        User?    @relation("Referee", fields: [refereeId], references: [id])
 }
 
 model PromotionCode {

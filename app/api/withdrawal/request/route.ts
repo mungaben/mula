@@ -5,11 +5,16 @@ const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest) {
   const { userId, simPhoneNumberId, amount } = await req.json();
+  console.log("withrawal request",userId, simPhoneNumberId, amount);
+  
 
   try {
     const user = await prisma.user.findUnique({
       where: { id: userId },
     });
+
+    console.log("user",user);
+    
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -18,6 +23,9 @@ export async function POST(req: NextRequest) {
     const simPhoneNumber = await prisma.simPhoneNumber.findUnique({
       where: { id: simPhoneNumberId },
     });
+
+    console.log("simnumber",simPhoneNumber);
+    
 
     if (!simPhoneNumber) {
       return NextResponse.json({ error: "Invalid SIM phone number" }, { status: 400 });

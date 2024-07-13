@@ -1,11 +1,11 @@
-// app/api/auth/register.ts
 import { NextApiRequest, NextApiResponse } from 'next';
 import { hash } from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
+import { registerReferral } from '@/lib/registerReferral'; // Assuming this function is defined elsewhere
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const { name, email, password, phone } = req.body;
+    const { name, email, password, phone, referralLink } = req.body;
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
@@ -28,6 +28,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         password: hashedPassword,
       },
     });
+
+    // Handle referral link if provided
+    if (referralLink) {
+      const referralResponse = await registerReferral(referralLink, user.id);
+      if (referralResponse.error) {
+        return res.status(400).json({ message: referralResponse.error });
+      }
+    }
 
     return res.status(201).json(user);
   } else {
