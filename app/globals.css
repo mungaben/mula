@@ -33,6 +33,7 @@
     --ring: 20 14.3% 4.1%;
 
     --radius: 0.5rem;
+    --backG: #010806;
   }
 
   .dark {
@@ -168,5 +169,10 @@
   .hidden-text {
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
+  }
+  .backG{
+    background-color: #010806;
+    color: #097E60;
+   
   }
 }

@@ -1,11 +1,17 @@
 import { PrismaClient } from '@prisma/client';
+import { UserRoundIcon } from 'lucide-react';
 import { NextRequest, NextResponse } from 'next/server';
 
 const prisma = new PrismaClient();
 
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest,{ params }: { params: { id: string } }) {
   const { searchParams } = new URL(req.url!);
-  const userId = searchParams.get('id');
+  // const userId = searchParams.get('id');
+  const userId=params.id
+
+
+
+  console.log("userId",userId)
 
   if (!userId) {
     return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
@@ -36,6 +42,9 @@ export async function GET(req: NextRequest) {
       name: user.name,
       phone: user.phone,
       balance: user.balance,
+      email:user.email,
+      role: user.role,
+      userId:user.id,
       totalDeposits,
       totalWithdrawals,
       totalInterest,
@@ -53,7 +62,8 @@ export async function GET(req: NextRequest) {
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest,{ params }: { params: { id: string } }) {
+  const userId = params.id
   try {
     const data = await req.json();
 
@@ -68,15 +78,15 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function PUT(req: NextRequest) {
-  const { searchParams } = new URL(req.url!);
-  const userId = searchParams.get('id');
-
-  if (!userId) {
-    return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
-  }
-
+export async function PUT(req: NextRequest,{ params }: { params: { id: string } }) {
   try {
+    const { searchParams } = new URL(req.url!);
+    const userId = params.id
+
+    if (!userId) {
+      return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+    }
+
     const data = await req.json();
 
     const updatedUser = await prisma.user.update({

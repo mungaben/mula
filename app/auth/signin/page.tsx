@@ -27,7 +27,7 @@ export default function SignIn() {
     if (result?.error) {
       setError(result.error);
     } else {
-      router.push('/dashboard'); // Redirect to dashboard after successful login
+      router.push('/dashboad/Profile'); // Redirect to dashboard after successful login
     }
   };
 

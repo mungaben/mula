@@ -18,7 +18,6 @@ import useModuleStore from "@/lib/storage/modules";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { requestWithdrawal } from "@/lib/api";
 
 interface User {
   id: string;
@@ -59,19 +58,28 @@ export function RequestWithdraw({ user }: RequestWithdrawProps) {
 
     if (user?.id) {
       try {
-        const response = await requestWithdrawal({
-          userId:user.id,
-          simPhoneNumberId: phoneNumber || user?.phone || '', // Ensure it's a string
-          amount: parsedAmount,
+       
+        const response = await fetch('/api/withdrawal/request', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: user.id,
+            simPhoneNumberId: phoneNumber || user?.phone || '', // Ensure it's a string
+            amount: parsedAmount,
+          }),
         });
 
-        if (response.success) {
+        const result = await response.json();
+
+        if (response.ok) {
           toast.success('Withdrawal request submitted successfully!');
           setPhoneNumber('');
           setAmount('');
           toggleWithdrawModule();
         } else {
-          toast.error('Failed to submit withdrawal request.');
+          toast.error(result.error || 'Failed to submit withdrawal request.');
         }
       } catch (err) {
         toast.error('An error occurred while submitting the request.');
@@ -91,13 +99,13 @@ export function RequestWithdraw({ user }: RequestWithdrawProps) {
             Enter your phone number and the amount to withdraw.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className=" flex flex-col gap-4 ">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="grid gap-4">
             <div>
               <Label htmlFor="phoneNumber">Phone Number</Label>
               <Input
                 id="phoneNumber"
-                value={user?.phone}
+                value={phoneNumber || user?.phone || ''}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 placeholder="Enter phone number"
               />

@@ -21,10 +21,10 @@ export async function fetchPhoneNumbers() {
 
 
 
-
-
-  export async function requestWithdrawal(data: { userId: string; simPhoneNumberId: string; amount: number }) {
-    const response = await fetch('/api/withdrawal/request', {
+// lib/api.ts
+export async function requestWithdrawal(data: { userId: string, simPhoneNumberId: string, amount: number }) {
+  try {
+    const response = await fetch('/api/withdraw/request', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -32,8 +32,13 @@ export async function fetchPhoneNumbers() {
       body: JSON.stringify(data),
     });
 
-    console.log("response",response.json());
-    
-  
+    if (!response.ok) {
+      throw new Error('Failed to submit withdrawal request');
+    }
+
     return await response.json();
+  } catch (error) {
+    console.error('Error submitting withdrawal request:', error);
+    throw error;
   }
+}
