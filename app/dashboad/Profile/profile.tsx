@@ -44,11 +44,12 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
 
   const fetchProfile = async (userId: string) => {
     try {
-      const response = await fetch(`/api/Users?Id=${userId}`);
+      const response = await fetch(`/api/Users/${userId}`);
 
-      console.log("response",response);
+    
       
       const result = await response.json();
+      console.log("response",response);
 
       if (response.ok) {
         setProfile(result);

@@ -11,10 +11,11 @@ const productSchema = z.object({
   growthPercentage: z.number().positive(),
   subscribersCount: z.number().int().nonnegative(),
 });
+// req: NextRequest,{ params }: { params: { id: string } }
 
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest,{params}:{params:{id:string}}) {
   const { searchParams } = new URL(req.url);
-  const id = searchParams.get('id');
+  const id = params.id
 
   if (!id) {
     return NextResponse.json({ error: "No id passed in params" }, { status: 404 });
@@ -33,7 +34,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest,{params}:{params:{id:string}}) {
   try {
     const body = await req.json();
     const parsedBody = productSchema.parse(body);
@@ -52,9 +53,11 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function PUT(req: NextRequest) {
+export async function PUT(req: NextRequest,{params}:{params:{id:string}}) {
   const { searchParams } = new URL(req.url);
-  const id = searchParams.get('id');
+  const id = params.id;
+  console.log("id",id);
+  
 
   if (!id) {
     return NextResponse.json({ error: "No id passed in params" }, { status: 404 });
