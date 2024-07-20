@@ -38,11 +38,12 @@ export async function GET(req: NextRequest) {
     const totalInterest = user.interests.reduce((acc, interest) => acc + interest.amount, 0);
     const totalReferrals = user.referrals.length; // Counting the number of referrals
 
+    // Add a check to ensure all string operations are performed safely
     const detailedUser = {
       id: user.id,
-      name: user.name,
-      email: user.email,
-      phone: user.phone,
+      name: user.name || 'N/A', // Ensure name is not undefined
+      email: user.email || 'N/A', // Ensure email is not undefined
+      phone: user.phone || 'N/A', // Ensure phone is not undefined
       balance: user.balance,
       totalDeposits,
       totalWithdrawals,
