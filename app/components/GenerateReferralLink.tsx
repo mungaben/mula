@@ -15,7 +15,8 @@ import {
 import { Label } from "@/components/ui/label";
 import toast from "react-hot-toast";
 import useModuleStore from "@/lib/storage/modules";
-import { useSession } from "next-auth/react";
+import { getSession } from "next-auth/react";
+
 
 interface User {
   id: string;
@@ -59,7 +60,10 @@ export function ReferralLinkModal({ user }: ReferralLinkProps) {
   };
 
   const handleGenerateLink = async () => {
-    if (!user?.id) {
+
+    const session =await getSession()
+
+    if (!session?.user) {
       toast.error("User not authenticated.");
       return;
     }
@@ -71,7 +75,7 @@ export function ReferralLinkModal({ user }: ReferralLinkProps) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userId: user.id }),
+        body: JSON.stringify({ userId: session.user.id }),
       });
 
       const result = await response.json();
@@ -100,7 +104,6 @@ export function ReferralLinkModal({ user }: ReferralLinkProps) {
 
   return (
     <Dialog open={referralLinkModule} onOpenChange={toggleReferralLinkModule}>
-      <DialogTrigger>Generate Referral Link</DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Generate Referral Link</DialogTitle>

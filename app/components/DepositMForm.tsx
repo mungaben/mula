@@ -52,7 +52,6 @@ const DepositMForm = () => {
   
     return (
         <Dialog open={depositModule} onOpenChange={toggleDepositModule}  >
-            <DialogTrigger>Open</DialogTrigger>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Deposit</DialogTitle>

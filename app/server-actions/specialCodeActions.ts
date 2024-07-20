@@ -6,7 +6,7 @@ import { specialCodeSchema, redeemCodeSchema } from '@/lib/schemas';
 import { sendNotification } from '@/lib/notification';
 import { z } from 'zod';
 
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 // Generate a unique code using crypto
 export const generateUniqueCode = (): string => {

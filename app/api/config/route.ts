@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import authOptions from '@/lib/configs/auth/authOptions';
 
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 async function isAdmin(req: NextRequest) {
   const session = await getServerSession(authOptions);

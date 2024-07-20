@@ -3,6 +3,7 @@ import DepositMForm from '@/app/components/DepositMForm';
 import { ReferralLinkModal } from '@/app/components/GenerateReferralLink';
 import { RedeemCode } from '@/app/components/Redeemcodes';
 import { RequestWithdraw } from '@/app/components/RequestWithdraw';
+import getuser from '@/app/products/getuser';
 import authOptions from '@/lib/configs/auth/authOptions';
 import { getServerSession } from 'next-auth/next';
 import React, { ReactNode } from 'react';
@@ -14,7 +15,7 @@ interface LayoutProps {
 const ProfileLayout: React.FC<LayoutProps> = async({ children }) => {
 
 
-  const session = await getServerSession(authOptions)
+  const session = await getuser()
   
   return (
     <div className="min-h-screen w-full  bg-gradient-to-r from-[#0A493A] via-[#0A493A] to-[#0A493A] justify-items-center h-full">

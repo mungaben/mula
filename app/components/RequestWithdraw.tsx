@@ -15,9 +15,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import useModuleStore from "@/lib/storage/modules";
-import { useSession } from "next-auth/react";
-import { useState } from "react";
 import toast from "react-hot-toast";
+import { useState } from "react";
 
 interface User {
   id: string;
@@ -91,7 +90,7 @@ export function RequestWithdraw({ user }: RequestWithdrawProps) {
 
   return (
     <Dialog open={withdrawModule} onOpenChange={toggleWithdrawModule}>
-      <DialogTrigger>Request Withdraw</DialogTrigger>
+     
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Request Withdrawal</DialogTitle>

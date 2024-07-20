@@ -6,31 +6,6 @@ import React from 'react';
 
 const Page = async () => {
 
- 
- 
-const session = await getServerSession()
-
-console.log("session",session);
-
-
-
-if (!session) {
-  redirect("auth/signin")
-
-  
-}
-
-if(session){
-  // to homepage
-
-}
-
-
-
-
-
-
-
   
   return (
     <div className="w-full h-screen flex justify-center items-center color-alternate overflow-hidden">

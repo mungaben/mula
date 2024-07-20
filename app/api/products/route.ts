@@ -5,31 +5,31 @@ import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 
+// /products/
+export async function GET(req: NextRequest, res: NextResponse) {
 
-export async function GET(req:NextRequest,res:NextResponse) {
+  // get product with all details 
 
-    // get product with all details 
+  try {
+    const products = await prisma.product.findMany()
 
-    try {
-        const products= await prisma.product.findMany()
+    if (!products) {
+      return NextResponse.json({ error: "no such products" }, { status: 404 })
 
-        if (!products) {
-            return NextResponse.json({error:"no such products"},{status:404})
-            
-        }
-        return NextResponse.json(products)
-        
-    } catch (error) {
-        if (error instanceof Error) {
-            return NextResponse.json({ error: 'Error fetching product', details: error.message }, { status: 500 });
-          } else {
-            return NextResponse.json({ error: 'An unknown error occurred' }, { status: 500 });
-          }
-        
+    }
+    return NextResponse.json(products)
+
+  } catch (error) {
+    if (error instanceof Error) {
+      return NextResponse.json({ error: 'Error fetching product', details: error.message }, { status: 500 });
+    } else {
+      return NextResponse.json({ error: 'An unknown error occurred' }, { status: 500 });
     }
 
+  }
 
-    
+
+
 }
 
 
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { name, price, earningPer24Hours,growthPercentage } = await req.json();
+    const { name, price, earningPer24Hours, growthPercentage } = await req.json();
 
     // Validate input
     if (!name || !price || !earningPer24Hours) {

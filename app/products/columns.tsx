@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import { getSession } from 'next-auth/react';
+import getuser from './getuser';
+import useFetch from '@/lib/useFetch'; // Adjust the import path as needed
 
 type Product = {
   id: string;
@@ -28,28 +30,9 @@ export const columns: ColumnDef<Product>[] = [
     cell: info => `Ksh ${info.getValue() as number}`,
   },
   {
-    accessorKey: 'earningPer24Hours',
-    header: 'Earnings per 24 Hours',
-    cell: info => `Ksh ${info.getValue() as number}`,
-  },
-  {
     accessorKey: 'growthPercentage',
     header: 'Growth Percentage',
     cell: info => `${info.getValue() as number}%`,
-  },
-  {
-    accessorKey: 'subscribersCount',
-    header: 'Subscribers Count',
-  },
-  {
-    accessorKey: 'createdAt',
-    header: 'Created At',
-    cell: info => new Date(info.getValue() as string).toLocaleString(),
-  },
-  {
-    accessorKey: 'updatedAt',
-    header: 'Updated At',
-    cell: info => new Date(info.getValue() as string).toLocaleString(),
   },
   {
     id: 'actions',
@@ -58,12 +41,14 @@ export const columns: ColumnDef<Product>[] = [
   },
 ];
 
-const ActionButtons = async ({ productId }: { productId: string }) => {
+const ActionButtons = ({ productId }: { productId: string }) => {
   const router = useRouter();
-  const session = await getSession()
-
+  const { data, error, isLoading } = useFetch<{ isPurchased: boolean }>(`/api/products/${productId}/isPurchased`);
+  
   const handleBuyProduct = async () => {
-    if (!session?.user?.id) {
+    const session = await getuser();
+
+    if (!session) {
       toast({
         title: 'Error!',
         description: 'You must be logged in to buy a product.',
@@ -72,31 +57,33 @@ const ActionButtons = async ({ productId }: { productId: string }) => {
     }
 
     try {
-      // console.log('Sending productId:', productId); // Debugging line
-      // console.log('Sending userId:', session.user.id); // Debugging line
       const response = await fetch(`/api/products/${productId}/Buy`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId: session.user.id }),
+        body: JSON.stringify({ userId: session.id }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to buy product');
+        toast({
+          title: 'Error!',
+          description: errorData.error || 'Failed to buy product',
+        });
+        console.error("Error:", errorData.error);
+        return;
       }
 
       toast({
         title: 'Success!',
         description: 'Product purchased successfully.',
       });
-      router.push('/dashboad/Profile');
+      router.push('/dashboard/Profile');
     } catch (error) {
       console.error('Error buying product:', error);
       let errorMessage = 'An unexpected error occurred';
 
-      // Type guard to narrow down the type of `error`
       if (error instanceof Error) {
         errorMessage = error.message;
       }
@@ -108,13 +95,24 @@ const ActionButtons = async ({ productId }: { productId: string }) => {
     }
   };
 
+  if (isLoading) {
+    return <Button className="text-green-500" disabled>Loading...</Button>;
+  }
+
+  if (error) {
+    return <Button className="text-red-500" disabled>Error</Button>;
+  }
+
+  const isPurchased = data?.isPurchased ?? false;
+
   return (
     <div className="flex space-x-2">
-      {/* <Button className="text-blue-500" onClick={() => router.push(`/dashboard/product/${productId}`)}>
-        Details
-      </Button> */}
-      <Button className="text-green-500" onClick={handleBuyProduct}>
-        Buy
+      <Button
+        className="text-green-500"
+        onClick={handleBuyProduct}
+        disabled={isPurchased}
+      >
+        {isPurchased ? 'Purchased' : 'Buy'}
       </Button>
     </div>
   );

@@ -6,7 +6,7 @@ const secret = process.env.NEXTAUTH_SECRET;
 
 export default async function middleware(req: NextRequest) {
   // Define the paths that require authentication
-  const protectedPaths = ['/dashboard', '/user', '/profile', '/api/protected'];
+  const protectedPaths = ['/dashboard', '/user', '/profile', '/api/protected','/','/dashboad'];
 
   const path = req.nextUrl.pathname;
 
@@ -34,6 +34,7 @@ export const config = {
     '/user/:path*',
     '/profile/:path*',
     '/api/protected/:path*',
-    '/api/Users'
+    '/api/Users',
+    '/'
   ],
 };

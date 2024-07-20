@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/card";
 import useModuleStore from "@/lib/storage/modules";
 import Link from 'next/link';
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import LoadingSpinner from "@/app/components/LoadingSpinner";
 
@@ -145,7 +144,6 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
           ))}
         </div>
       </CardContent>
-      <CardFooter className="text-gray-600">Card Footer</CardFooter>
     </Card>
   );
 };

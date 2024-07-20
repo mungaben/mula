@@ -34,7 +34,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { redeemCodeSchema } from "@/lib/schemas";
 import useModuleStore from "@/lib/storage/modules";
-import { useSession } from "next-auth/react";
+import { getSession, useSession } from "next-auth/react";
 
 interface User {
   id: string;
@@ -52,12 +52,15 @@ export function RedeemCode({ user }: RedeemCodeProps) {
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
+
+    const session=await getSession()
+
     e.preventDefault();
     if (!code) {
       setError('Please enter a code.');
       return;
     }
-    if (!user?.id) {
+    if (!session?.user) {
       toast.error('User not authenticated.');
       return;
     }
@@ -70,7 +73,7 @@ export function RedeemCode({ user }: RedeemCodeProps) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ code, userId: user.id }),
+        body: JSON.stringify({ code, userId:session.user.id }),
       });
 
       const result = await response.json();
@@ -89,7 +92,7 @@ export function RedeemCode({ user }: RedeemCodeProps) {
 
   return (
     <Dialog open={redeemCodeModule} onOpenChange={toggleRedeemCodeModule}>
-      <DialogTrigger>Redeem Code</DialogTrigger>
+   
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Redeem Special Code</DialogTitle>
