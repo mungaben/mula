@@ -4,10 +4,7 @@ import DefaultLayout from "@/app/components/components/Layouts/DefaultLaout";
 import { Metadata } from "next";
 
 
-export const metadata: Metadata = {
-  title: "Next.js Buttons Page | NextAdmin - Next.js Dashboard Kit",
-  description: "This is Next.js Buttons page for NextAdmin Dashboard Kit",
-};
+
 
 const Buttons = () => {
   return (
