@@ -59,7 +59,6 @@ export async function GET(req: NextRequest) {
       include: {
         deposits: true,
         awaitingDeposits: true,
-        withdrawals: true,
       },
     });
 
