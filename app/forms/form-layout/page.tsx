@@ -1,5 +1,5 @@
 import Breadcrumb from "@/app/components/components/Breadcrumbs/Breadcrumb";
-import InputGroup from "@/app/components/components/FormElements/InputGroup";
+import InputGroup from "@/app/components/components/FormElements/Checkboxes/InputGroup";
 import SelectGroupOne from "@/app/components/components/FormElements/SelectGroup/SelectGroupOne";
 import DefaultLayout from "@/app/components/components/Layouts/DefaultLaout";
 
