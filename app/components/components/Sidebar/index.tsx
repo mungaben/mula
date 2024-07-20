@@ -49,7 +49,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   ];
 
   const getButtonClasses = (label: string) => {
-    const isActive = pageName.toLowerCase() === label.toLowerCase();
+     // Ensure label and pageName are defined before calling toLowerCase
+     const isActive = pageName && label && pageName.toLowerCase() === label.toLowerCase();
     return `group relative flex items-center gap-3 rounded-[7px] px-3.5 py-3 font-medium duration-300 ease-in-out ${
       isActive
         ? "bg-primary/[.07] text-primary dark:bg-white/10 dark:text-white"

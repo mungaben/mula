@@ -32,7 +32,7 @@ const SidebarItem = ({ item, pageName, setPageName }: SidebarItemProps) => {
     return null; // Skip rendering if label is undefined
   }
 
-  const isActive = pageName.toLowerCase() === item.label.toLowerCase();
+  const isActive = pageName && pageName.toLowerCase() === item.label.toLowerCase();
 
   const commonClasses = `group relative flex items-center gap-3 rounded-[7px] px-3.5 py-3 font-medium duration-300 ease-in-out ${
     isActive
