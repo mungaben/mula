@@ -1,7 +1,9 @@
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
+
 import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLaout";
-import ProfileBox from "@/components/ProfileBox";
+import DefaultLayout from "../components/components/Layouts/DefaultLaout";
+import ProfileBox from "../components/components/ProfileBox";
+import Breadcrumb from "../components/components/Breadcrumbs/Breadcrumb";
+
 
 export const metadata: Metadata = {
   title: "Next.js Profile Page | NextAdmin - Next.js Dashboard Kit",

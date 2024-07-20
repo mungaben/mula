@@ -1,10 +1,10 @@
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import TableOne from "@/components/Tables/TableOne";
-import TableThree from "@/components/Tables/TableThree";
-import TableTwo from "@/components/Tables/TableTwo";
-
 import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLaout";
+import Breadcrumb from "../components/components/Breadcrumbs/Breadcrumb";
+import DefaultLayout from "../components/components/Layouts/DefaultLaout";
+import TableOne from "../components/components/Tables/TableOne";
+import TableThree from "../components/components/Tables/TableThree";
+import TableTwo from "../components/components/Tables/TableTwo";
+
 
 export const metadata: Metadata = {
   title: "Next.js Tables Page | NextAdmin - Next.js Dashboard Kit",

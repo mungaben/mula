@@ -1,7 +1,8 @@
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
+import Breadcrumb from "@/app/components/components/Breadcrumbs/Breadcrumb";
+import ButtonDefault from "@/app/components/components/Buttons/ButtonDefault";
+import DefaultLayout from "@/app/components/components/Layouts/DefaultLaout";
 import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLaout";
-import ButtonDefault from "@/components/Buttons/ButtonDefault";
+
 
 export const metadata: Metadata = {
   title: "Next.js Buttons Page | NextAdmin - Next.js Dashboard Kit",
