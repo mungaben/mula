@@ -1,7 +1,8 @@
-import React from "react";
-import FormElements from "@/components/FormElements";
+import FormElements from "@/app/components/components/FormElements";
+import DefaultLayout from "@/app/components/components/Layouts/DefaultLaout";
 import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLaout";
+import React from "react";
+
 
 export const metadata: Metadata = {
   title: "Next.js Form Elements Page | NextAdmin - Next.js Dashboard Kit",

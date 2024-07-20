@@ -1,8 +1,8 @@
-import BasicChart from "@/components/Charts/BasicChart";
+import Breadcrumb from "@/app/components/components/Breadcrumbs/Breadcrumb";
+import BasicChart from "@/app/components/components/Charts/BasicChart";
+import DefaultLayout from "@/app/components/components/Layouts/DefaultLaout";
 import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLaout";
-import React from "react";
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
+
 
 export const metadata: Metadata = {
   title: "Next.js Basic Chart Page | NextAdmin - Next.js Dashboard Kit",
