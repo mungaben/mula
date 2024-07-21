@@ -1,7 +1,7 @@
 import Breadcrumb from "@/app/components/components/Breadcrumbs/Breadcrumb";
 import ButtonDefault from "@/app/components/components/Buttons/ButtonDefault";
 import DefaultLayout from "@/app/components/components/Layouts/DefaultLaout";
-import { Metadata } from "next";
+
 
 
 

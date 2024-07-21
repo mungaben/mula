@@ -53,8 +53,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
      const isActive = pageName && label && pageName.toLowerCase() === label.toLowerCase();
     return `group relative flex items-center gap-3 rounded-[7px] px-3.5 py-3 font-medium duration-300 ease-in-out ${
       isActive
-        ? "bg-primary/[.07] text-primary dark:bg-white/10 dark:text-white"
-        : "text-dark-4 hover:bg-gray-2 hover:text-dark dark:text-gray-5 dark:hover:bg-white/10 dark:hover:text-white"
+        ? "bg-primary/[.07] text-primary dark:bg-white/50 dark:text-white text-white"
+        : "text-dark-4 hover:bg-gray-2 hover:text-dark dark:text-gray-5 dark:hover:bg-white/40 dark:hover:text-white text-white"
     }`;
   };
 
@@ -69,23 +69,23 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
       >
         {/* SIDEBAR HEADER */}
         <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5 xl:py-10">
-          <Link href="/">
+          <Link href="/" className="rounded-xl border-gray-2">
             <Image
-              width={176}
+              width={100}
               height={32}
-              src={"/images/Tik.png"}
+              src={"/Tik.png"}
               alt="Logo"
               priority
-              className="dark:hidden"
+              className="dark:hidden rounded-md dark:bg-slate-300 bg-stone-400"
               style={{ width: "auto", height: "auto" }}
             />
             <Image
-              width={176}
-              height={32}
-              src={"/images/Tik.png"}
+              width={100}
+              height={32} 
+              src={"/Tik.png"}
               alt="Logo"
               priority
-              className="hidden dark:block"
+              className="hidden dark:block rounded-md dark:bg-slate-300 bg-stone-500"
               style={{ width: "auto", height: "auto" }}
             />
           </Link>
@@ -151,10 +151,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 />
                 {tableConst.map((item, index) => (
                   <Button
+                 
                     key={index}
                     onClick={item.action}
                     size="sm"
-                    className={getButtonClasses(item.label)}
+                    className={getButtonClasses(item.label) }
                   >
                     {item.label}
                   </Button>

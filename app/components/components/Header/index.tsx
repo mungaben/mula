@@ -60,7 +60,7 @@ const Header = (props: {
             <Image
               width={32}
               height={32}
-              src={"/images/Tik.png"}
+              src={"/Tik.png"}
               alt="Logo"
             />
           </Link>

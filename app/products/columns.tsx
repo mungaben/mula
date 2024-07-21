@@ -7,6 +7,8 @@ import { toast } from '@/components/ui/use-toast';
 import { getSession } from 'next-auth/react';
 import getuser from './getuser';
 import useFetch from '@/lib/useFetch'; // Adjust the import path as needed
+import { useState } from 'react';
+import useModuleStore from '@/lib/storage/modules';
 
 type Product = {
   id: string;
@@ -42,10 +44,14 @@ export const columns: ColumnDef<Product>[] = [
 ];
 
 const ActionButtons = ({ productId }: { productId: string }) => {
+  const { depositModule, toggleDepositModule } = useModuleStore();
   const router = useRouter();
-  const { data, error, isLoading } = useFetch<{ isPurchased: boolean }>(`/api/products/${productId}/isPurchased`);
-  
+  const { data, error, isLoading } = useFetch<{ isPurchased: boolean; hasEnoughBalance: boolean }>(`/api/products/${productId}/isPurchased`);
+  const [buttonClicked, setButtonClicked] = useState(false);
+  const [belowbalance, setBelowBalance] = useState(false);
+
   const handleBuyProduct = async () => {
+    setButtonClicked(true);
     const session = await getuser();
 
     if (!session) {
@@ -53,11 +59,22 @@ const ActionButtons = ({ productId }: { productId: string }) => {
         title: 'Error!',
         description: 'You must be logged in to buy a product.',
       });
+      setButtonClicked(false);
+      return;
+    }
+
+    if (!data?.hasEnoughBalance) {
+      toast({
+        title: 'Insufficient Balance',
+        description: 'You do not have enough balance to buy this product. Please add balance to proceed.',
+      });
+      setBelowBalance(true);
+      setButtonClicked(false);
       return;
     }
 
     try {
-      const response = await fetch(`/api/products/${productId}/Buy`, {
+      const response = await fetch(`/api/products/${productId}/buy`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -71,7 +88,7 @@ const ActionButtons = ({ productId }: { productId: string }) => {
           title: 'Error!',
           description: errorData.error || 'Failed to buy product',
         });
-        console.error("Error:", errorData.error);
+        setButtonClicked(false);
         return;
       }
 
@@ -92,6 +109,7 @@ const ActionButtons = ({ productId }: { productId: string }) => {
         title: 'Error!',
         description: errorMessage,
       });
+      setButtonClicked(false);
     }
   };
 
@@ -110,10 +128,18 @@ const ActionButtons = ({ productId }: { productId: string }) => {
       <Button
         className="text-green-500"
         onClick={handleBuyProduct}
-        disabled={isPurchased}
+        disabled={isPurchased || buttonClicked || belowbalance}
       >
         {isPurchased ? 'Purchased' : 'Buy'}
       </Button>
+      {belowbalance && (
+        <Button
+          className="text-blue-500"
+          onClick={() =>toggleDepositModule() }
+        >
+          Add Balance
+        </Button>
+      )}
     </div>
   );
 };

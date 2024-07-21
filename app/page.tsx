@@ -14,6 +14,7 @@ import WithdrawalRequestForm from './components/WithdrawalRequestForm';
 import { ReferralLinkModal } from './components/GenerateReferralLink';
 import { RequestWithdraw } from './components/RequestWithdraw';
 import { RedeemCode } from './components/Redeemcodes';
+import { Toaster } from '@/components/ui/toaster';
 
 const Page = () => {
   return (
@@ -42,6 +43,7 @@ const Page = () => {
       <ReferralLinkModal/>
       <RequestWithdraw/>
       <RedeemCode/>
+      <Toaster/>
     
 
       </>
