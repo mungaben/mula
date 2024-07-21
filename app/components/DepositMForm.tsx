@@ -18,7 +18,6 @@ import toast from 'react-hot-toast';
 
 
 
-
 const DepositMForm = () => {
 
     const phoneNumbers = [
@@ -72,7 +71,7 @@ const DepositMForm = () => {
                         {phoneNumbers.map((number, index) => (
                             <div
                                 key={index}
-                                className="p-2 border border-gray-300 rounded cursor-pointer hover:bg-gray-100"
+                                className="p-2 border border-gray-300 rounded cursor-pointer hover:bg-gray-100 text-black dark:text-white"
                                 onClick={() => handleCopy(number)}
                             >
                                 {number}

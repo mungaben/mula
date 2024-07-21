@@ -15,8 +15,12 @@ import { ReferralLinkModal } from './components/GenerateReferralLink';
 import { RequestWithdraw } from './components/RequestWithdraw';
 import { RedeemCode } from './components/Redeemcodes';
 import { Toaster } from '@/components/ui/toaster';
+import { getSession } from 'next-auth/react';
+import { redirect } from 'next/navigation';
 
-const Page = () => {
+
+const Page = async() => {
+ 
   return (
     // <div className="min-h-screen bg-gray-50">
     //   <Navbar />

@@ -100,7 +100,7 @@ export function RedeemCode({ user }: RedeemCodeProps) {
             Enter your special code to redeem.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-black dark:text-stone-200">
           <div className="grid gap-4">
             <div>
               <Label htmlFor="code">Code</Label>

@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import toast from "react-hot-toast";
 import useModuleStore from "@/lib/storage/modules";
 import { getSession } from "next-auth/react";
+import { Input } from "@/components/ui/input";
 
 
 interface User {
@@ -116,7 +117,7 @@ export function ReferralLinkModal({ user }: ReferralLinkProps) {
             <div>
               <Label htmlFor="referralLink">Your Referral Link</Label>
               <div className="flex items-center gap-2">
-                <input
+                <Input
                   id="referralLink"
                   type="text"
                   value={`${window.location.origin}/auth/signup?referral=${referralLink}`}

@@ -106,7 +106,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
               Balance
             </span>
             <span className="capitalize text-xl lg:text-3xl md:text-3xl sm:text-xl font-medium">
-              <span className="text-4xl font-extrabold text-black relative">
+              <span className="text-4xl font-extrabold text-black dark:text-white relative">
                 <span className="text-transparent text-3xl gap-2 bg-clip-text bg-gradient-to-br from-gray-800 to-gray-500">
                   Ksh
                 </span>

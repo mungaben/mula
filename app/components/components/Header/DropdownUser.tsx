@@ -1,10 +1,64 @@
-import { useState } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import ClickOutside from "../ClickOutside";
+'use client';
 
-const DropdownUser = () => {
+import { useState } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import ClickOutside from '../ClickOutside';
+import useFetch from '@/lib/useFetch';
+import { toast } from '@/components/ui/use-toast';
+import { z } from 'zod';
+import { getSession, useSession } from 'next-auth/react';
+
+
+// Define the schema using Zod
+const profileSchema = z.object({
+  name: z.string(),
+  email: z.string().email(),
+  balance: z.number(),
+  phone: z.string(),
+  role: z.string(),
+  userId: z.string(),
+  totalDeposits: z.number(),
+  totalWithdrawals: z.number(),
+  totalInterest: z.number(),
+  totalCommission: z.number(),
+  referrals: z.array(
+    z.object({
+      name: z.string(),
+      phone: z.string(),
+    })
+  ),
+});
+
+const DropdownUser = async() => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+ 
+
+  const { data, error, isLoading } = useFetch(`/api/Users/Profile`);
+  
+  // Validate the fetched data with Zod
+  const parseProfile = () => {
+    if (!data) return null;
+    const result = profileSchema.safeParse(data);
+    if (result.success) {
+      return result.data;
+    } else {
+      toast({
+        title: 'Error!',
+        description: 'Invalid user profile data.',
+      });
+      return null;
+    }
+  };
+
+  const profile = parseProfile();
+
+  if (error) {
+    toast({
+      title: 'Error!',
+      description: 'Failed to load user profile data.',
+    });
+  }
 
   return (
     <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
@@ -19,8 +73,8 @@ const DropdownUser = () => {
             height={112}
             src="/images/user/user-03.png"
             style={{
-              width: "auto",
-              height: "auto",
+              width: 'auto',
+              height: 'auto',
             }}
             alt="User"
             className="overflow-hidden rounded-full"
@@ -28,10 +82,10 @@ const DropdownUser = () => {
         </span>
 
         <span className="flex items-center gap-2 font-medium text-dark dark:text-dark-6">
-          <span className="hidden lg:block">Jhon Smith</span>
+          <span className="hidden lg:block">{isLoading ? 'Loading...' : profile?.name}</span>
 
           <svg
-            className={`fill-current duration-200 ease-in ${dropdownOpen && "rotate-180"}`}
+            className={`fill-current duration-200 ease-in ${dropdownOpen && 'rotate-180'}`}
             width="20"
             height="20"
             viewBox="0 0 20 20"
@@ -48,7 +102,6 @@ const DropdownUser = () => {
         </span>
       </Link>
 
-      {/* <!-- Dropdown Star --> */}
       {dropdownOpen && (
         <div
           className={`absolute right-0 mt-7.5 flex w-[280px] flex-col rounded-lg border-[0.5px] border-stroke bg-white shadow-default dark:border-dark-3 dark:bg-gray-dark`}
@@ -60,8 +113,8 @@ const DropdownUser = () => {
                 height={112}
                 src="/images/user/user-03.png"
                 style={{
-                  width: "auto",
-                  height: "auto",
+                  width: 'auto',
+                  height: 'auto',
                 }}
                 alt="User"
                 className="overflow-hidden rounded-full"
@@ -72,10 +125,10 @@ const DropdownUser = () => {
 
             <span className="block">
               <span className="block font-medium text-dark dark:text-white">
-                Jhon Smith
+                {isLoading ? 'Loading...' : profile?.name}
               </span>
               <span className="block font-medium text-dark-5 dark:text-dark-6">
-                jonson@TikEarn.com
+                {isLoading ? 'Loading...' : profile?.email}
               </span>
             </span>
           </div>
@@ -109,7 +162,6 @@ const DropdownUser = () => {
                 View profile
               </Link>
             </li>
-
             <li>
               <Link
                 href="/pages/settings"
