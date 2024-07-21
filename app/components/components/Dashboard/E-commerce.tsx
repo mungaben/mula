@@ -1,19 +1,10 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import ChartThree from "../Charts/ChartThree";
-import ChartTwo from "../Charts/ChartTwo";
-import ChatCard from "../Chat/ChatCard";
-import TableOne from "../Tables/TableOne";
-import MapOne from "../Maps/MapOne";
-import DataStatsOne from "../DataStats/DataStatsOne";
-import ChartOne from "../Charts/ChartOne";
-import getuser from "@/app/products/getuser";
-import TableBuy from "../Tables/TableBuy";
 import Product from "@/app/products/Product";
-import { userAgent } from "next/server";
 import useFetch from "@/lib/useFetch";
 import { Product as prodx } from "@prisma/client";
+import React, { useState } from "react";
 import Loader from "../common/Loader";
+import DataStatsOne from "../DataStats/DataStatsOne";
 
 const ECommerce: React.FC = () => {
 
