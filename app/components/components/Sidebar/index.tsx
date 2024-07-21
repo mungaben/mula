@@ -116,7 +116,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
           <nav className="mt-1 px-4 lg:px-6">
             <div>
               <h3 className="mb-5 text-sm font-medium text-dark-4 dark:text-dark-6">
-                MAIN MENU
+                Menu
               </h3>
               <ul className="mb-6 flex flex-col gap-2">
                 <SidebarItem

@@ -6,8 +6,8 @@ import { Metadata } from "next";
 
 
 export const metadata: Metadata = {
-  title: "Next.js Settings Page | NextAdmin - Next.js Dashboard c",
-  description: "This is Next.js Settings page for NextAdmin Dashboard Kit",
+  title: "Next.js Settings Page | TikEarn - Next.js Dashboard c",
+  description: "This is Next.js Settings page for TikEarn Dashboard Kit",
 };
 
 const Settings = () => {

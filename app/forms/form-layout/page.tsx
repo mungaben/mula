@@ -8,8 +8,8 @@ import { Metadata } from "next";
 
 
 export const metadata: Metadata = {
-  title: "Next.js Form Layout Page | NextAdmin - Next.js Dashboard Kit",
-  description: "This is Next.js Form Layout page for NextAdmin Dashboard Kit",
+  title: "Next.js Form Layout Page | TikEarn - Next.js Dashboard Kit",
+  description: "This is Next.js Form Layout page for TikEarn Dashboard Kit",
 };
 
 const FormLayout = () => {

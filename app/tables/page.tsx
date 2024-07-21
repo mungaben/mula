@@ -7,8 +7,8 @@ import TableTwo from "../components/components/Tables/TableTwo";
 
 
 export const metadata: Metadata = {
-  title: "Next.js Tables Page | NextAdmin - Next.js Dashboard Kit",
-  description: "This is Next.js Tables page for NextAdmin Dashboard Kit",
+  title: "Next.js Tables Page | TikEarn - Next.js Dashboard Kit",
+  description: "This is Next.js Tables page for TikEarn Dashboard Kit",
 };
 
 const TablesPage = () => {
