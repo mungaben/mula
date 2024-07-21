@@ -13,12 +13,13 @@ export async function GET(req: NextRequest, res: NextResponse) {
     if (session) {
       const userId = session.user.id;
 
-      const purchasedProducts = await prisma.userProduct.findMany({
-        where: { userId },
-        include: { product: true }
-      });
+      // const purchasedProducts = await prisma.userProduct.findMany({
+      //   where: { userId },
+      //   include: { product: true }
+      // });
 
-      const products = purchasedProducts.map(p => p.product);
+      // const products = purchasedProducts.map(p => p.product);
+      const products = await prisma.product.findMany();
 
       return NextResponse.json(products);
     } else {

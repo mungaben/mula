@@ -8,11 +8,6 @@ import DataStatsOne from "../DataStats/DataStatsOne";
 
 const ECommerce: React.FC = () => {
 
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  console.log("use daa in ecommercer",user);
-
-
 
 
   
