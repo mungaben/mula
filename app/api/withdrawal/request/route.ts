@@ -6,9 +6,9 @@ import { prisma } from "@/lib/prisma";
 
 // Create a withdrawal request
 export async function POST(req: NextRequest) {
-  const { userId, simPhoneNumberId, amount } = await req.json();
+  const { userId, amount } = await req.json();
 
-  console.log("userid",userId, simPhoneNumberId, amount )
+  console.log("userid",userId, amount )
 
   try {
     const user = await prisma.user.findUnique({

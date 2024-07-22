@@ -11,11 +11,11 @@ export async function GET(req: NextRequest) {
 
     const user=await getServerSession()
     // const userId = searchParams.get('id');
-    const userId=user?.user.id
+    const userId=user?.user.email
   
   
   
-    console.log("userId",userId)
+    console.log("userId",user)
   
     if (!userId) {
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
   
     try {
       const user = await prisma.user.findUnique({
-        where: { id: userId },
+        where: { email: userId },
         include: {
           deposits: true,
           withdrawals: true,

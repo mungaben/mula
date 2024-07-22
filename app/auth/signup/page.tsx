@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import toast from 'react-hot-toast';
 
 const signUpSchema = z.object({
-  name: z.string().nonempty({ message: 'Name is required' }),
+  name: z.string().max(50).nonempty({ message: 'Name is required' }),
   email: z.string().email({ message: 'Invalid email address' }),
   password: z.string().min(6, { message: 'Password must be at least 6 characters long' }),
   phone: z.string().regex(/^\d{10,15}$/, { message: 'Phone number must be between 10 and 15 digits' }),
@@ -23,6 +23,7 @@ type SignUpFormData = z.infer<typeof signUpSchema>;
 export default function SignUp() {
   const [error, setError] = useState<string | null>(null);
   const [referralLink, setReferralLink] = useState<string | null>(null); // For holding the generated referral link
+  const [loading, setLoading] = useState(false); // Loading state
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -38,6 +39,7 @@ export default function SignUp() {
   }, [searchParams, setValue]);
 
   const onSubmit: SubmitHandler<SignUpFormData> = async (data) => {
+    setLoading(true); // Set loading state to true
     try {
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
@@ -66,6 +68,8 @@ export default function SignUp() {
       }
     } catch (error) {
       setError('An unknown error occurred');
+    } finally {
+      setLoading(false); // Set loading state to false
     }
   };
 
@@ -90,6 +94,7 @@ export default function SignUp() {
               placeholder="Name"
               {...register('name')}
               className="mb-4"
+              disabled={loading}
             />
             {errors.name && <span className="text-red-500">{errors.name.message}</span>}
             <Input
@@ -98,6 +103,7 @@ export default function SignUp() {
               {...register('email')}
               className="mb-4"
               required
+              disabled={loading}
             />
             {errors.email && <span className="text-red-500">{errors.email.message}</span>}
             <Input
@@ -106,6 +112,7 @@ export default function SignUp() {
               {...register('password')}
               className="mb-4"
               required
+              disabled={loading}
             />
             {errors.password && <span className="text-red-500">{errors.password.message}</span>}
             <Input
@@ -114,6 +121,7 @@ export default function SignUp() {
               {...register('phone')}
               className="mb-4"
               required
+              disabled={loading}
             />
             {errors.phone && <span className="text-red-500">{errors.phone.message}</span>}
             <Input
@@ -121,13 +129,13 @@ export default function SignUp() {
               placeholder="Referral Link (optional)"
               {...register('usedReferralLink')}
               className="mb-4"
-              
+              disabled={loading}
             />
             {errors.usedReferralLink && <span className="text-red-500">{errors.usedReferralLink.message}</span>}
           </CardContent>
           <CardFooter>
-            <Button type="submit" size="lg">
-              Sign Up
+            <Button type="submit" size="lg" disabled={loading}>
+              {loading ? 'Loading...' : 'Sign Up'}
             </Button>
           </CardFooter>
         </form>
@@ -137,7 +145,7 @@ export default function SignUp() {
             <p>Your referral link:</p>
             <div className="flex items-center">
               <Input readOnly value={`${window.location.origin}/auth/signup?referral=${referralLink}`} className="mr-2" />
-              <Button onClick={handleCopyLink}>Copy Link</Button>
+              <Button onClick={handleCopyLink} disabled={loading}>Copy Link</Button>
             </div>
           </div>
         )}

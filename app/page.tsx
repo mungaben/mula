@@ -1,12 +1,6 @@
 import React from 'react';
-import WalletBalance from '../components/homepage/WalletBalance';
-import Portfolio from '../components/homepage/Portfolio';
-import Header from '../components/homepage/Header';
-import Navbar from '../components/homepage/Navbar';
-import Withdrawals from '@/components/homepage/Withdrawals';
-import WalletList from '@/components/homepage/WaletBalance';
-import { AreaGraph } from '@/components/charts/area-graph';
-import Product from '@/app/products/Product';
+;
+
 import DefaultLayout from './components/components/Layouts/DefaultLaout';
 import ECommerce from './components/components/Dashboard/E-commerce';
 import DepositMForm from './components/DepositMForm';
@@ -15,11 +9,10 @@ import { ReferralLinkModal } from './components/GenerateReferralLink';
 import { RequestWithdraw } from './components/RequestWithdraw';
 import { RedeemCode } from './components/Redeemcodes';
 import { Toaster } from '@/components/ui/toaster';
-import { getSession } from 'next-auth/react';
-import { redirect } from 'next/navigation';
 
 
-const Page = async() => {
+
+const Page = () => {
  
   return (
     // <div className="min-h-screen bg-gray-50">

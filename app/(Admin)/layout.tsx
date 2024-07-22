@@ -30,18 +30,20 @@ export default async function RootLayout({
 
  
 
- // Convert the comma-separated string into an array
- const adminEmails = adminEmailsString ? adminEmailsString.split(',') : [];
-    
- // Check if the user's email is in the admin emails array
- const isAdmin = adminEmails.includes(userEmail);
+ /// Convert the comma-separated string into an array and trim each element
+const adminEmails = adminEmailsString
+? adminEmailsString.split(',').map(email => email.trim().replace(/^'|'$/g, ''))
+: [];
+console.log("adminemails", adminEmails, userEmail);
 
+// Check if the user's email is in the admin emails array
+const isAdmin = adminEmails.includes(userEmail);
 
- if(!isAdmin){
-  redirect("/")
- }
+console.log("isitan admn", isAdmin);
 
-
+if (!isAdmin) {
+redirect("/");
+}
 
   
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -9,6 +9,9 @@ import useLocalStorage from "../../hooks/useLocalStorage";
 import SidebarItem from "./SidebarItem";
 import useModuleStore from "@/lib/storage/modules";
 import { Button } from "@/components/ui/button";
+import useFetch from "@/lib/useFetch";
+import { getSession } from "next-auth/react";
+import { toast as tot } from '@/components/ui/use-toast';
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -25,6 +28,57 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     toggleReferralLinkModule,
   } = useModuleStore();
 
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleBecomeAdmin = async () => {
+    setIsLoading(true);
+    try {
+      const session = await getSession();
+      if (!session || !session.user || !session.user.id) {
+        tot({
+          title: 'Error',
+          description: 'User not authenticated',
+          style: { background: 'red', color: 'white' }
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      const response = await fetch(`/api/promotion-requests/${session.user.id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          roleRequested: "SUBADMIN", // Ensure this matches your backend schema
+        }),
+      });
+
+      if (response.ok) {
+        tot({
+          title: 'Success',
+          description: 'Promotion request created successfully',
+          style: { background: 'green', color: 'white' }
+        });
+      } else {
+        const result = await response.json();
+        tot({
+          title: 'Error',
+          description: result.error || 'Failed to create promotion request',
+          style: { background: 'red', color: 'white' }
+        });
+      }
+    } catch (error) {
+      tot({
+        title: 'Error',
+        description: 'An error occurred while creating the promotion request',
+        style: { background: 'red', color: 'white' }
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const tableConst = [
     {
       label: "Deposit",
@@ -40,7 +94,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     },
     {
       label: "BecomeAdmin",
-      route: "your_become_admin_link_here",
+      action: handleBecomeAdmin,
     },
     {
       label: "InviteFriend",
@@ -49,23 +103,21 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   ];
 
   const getButtonClasses = (label: string) => {
-     // Ensure label and pageName are defined before calling toLowerCase
-     const isActive = pageName && label && pageName.toLowerCase() === label.toLowerCase();
-    return `group relative flex items-center gap-3 rounded-[7px] px-3.5 py-3 font-medium duration-300 ease-in-out ${
-      isActive
-        ? "bg-primary/[.07] text-primary dark:bg-white/50 dark:text-white text-white"
-        : "text-dark-4 hover:bg-gray-2 hover:text-dark dark:text-gray-5 dark:hover:bg-white/40 dark:hover:text-white text-white"
-    }`;
+    // Ensure label and pageName are defined before calling toLowerCase
+    const isActive = pageName && label && pageName.toLowerCase() === label.toLowerCase();
+    return `group relative flex items-center gap-3 rounded-[7px] px-3.5 py-3 font-medium duration-300 ease-in-out ${isActive
+      ? "bg-primary/[.07] text-primary dark:bg-white/50 dark:text-white text-white"
+      : "text-dark-4 hover:bg-gray-2 hover:text-dark dark:text-gray-5 dark:hover:bg-white/40 dark:hover:text-white text-white"
+      }`;
   };
 
   return (
     <ClickOutside onClick={() => setSidebarOpen(false)}>
       <aside
-        className={`absolute left-0 top-0 z-9999 flex h-screen w-72.5 flex-col overflow-y-hidden border-r border-stroke bg-white dark:border-stroke-dark dark:bg-gray-dark lg:static lg:translate-x-0 ${
-          sidebarOpen
-            ? "translate-x-0 duration-300 ease-linear"
-            : "-translate-x-full"
-        }`}
+        className={`absolute left-0 top-0 z-9999 flex h-screen w-72.5 flex-col overflow-y-hidden border-r border-stroke bg-white dark:border-stroke-dark dark:bg-gray-dark lg:static lg:translate-x-0 ${sidebarOpen
+          ? "translate-x-0 duration-300 ease-linear"
+          : "-translate-x-full"
+          }`}
       >
         {/* SIDEBAR HEADER */}
         <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5 xl:py-10">
@@ -81,7 +133,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             />
             <Image
               width={100}
-              height={32} 
+              height={32}
               src={"/Tik.png"}
               alt="Logo"
               priority
@@ -151,16 +203,22 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 />
                 {tableConst.map((item, index) => (
                   <Button
-                 
                     key={index}
                     onClick={item.action}
                     size="sm"
-                    className={getButtonClasses(item.label) }
+                    className={getButtonClasses(item.label)}
+                    disabled={item.label === "BecomeAdmin" && isLoading}
                   >
                     {item.label}
+                    {item.label === "BecomeAdmin" && isLoading && (
+                      <span className="ml-2 loader"></span>
+                    )}
                   </Button>
                 ))}
+
+
               </ul>
+
             </div>
           </nav>
           {/* Sidebar Menu */}
