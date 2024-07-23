@@ -3,7 +3,6 @@
 import React, { useState } from 'react'
 import { Check, Copy, RefreshCcw } from "lucide-react";
 
-
 import {
     Dialog,
     DialogContent,
@@ -16,40 +15,33 @@ import useModuleStore from '@/lib/storage/modules';
 import toast from 'react-hot-toast';
 import useFetch from '@/lib/useFetch';
 
-
 export type PhoneNumber = {
     phoneNumber: string;
-  };
-
+};
 
 const DepositMForm = () => {
-
     const { data: phoneNumbers, error, isLoading } = useFetch<PhoneNumber[]>('/api/phonenumbers');
 
-
     const { depositModule, toggleDepositModule } = useModuleStore();
-
 
     const [selectedNumber, setSelectedNumber] = useState<string>('');
 
     const handleCopy = async (number: string) => {
-      try {
-        await navigator.clipboard.writeText(number);
-        toast.success('Number copied to clipboard!');
-        setSelectedNumber(number);
+        try {
+            await navigator.clipboard.writeText(number);
+            toast.success('Number copied to clipboard!');
+            setSelectedNumber(number);
+        } catch (err) {
+            toast.error('Failed to copy number.');
+        }
 
-      } catch (err) {
-        toast.error('Failed to copy number.');
-      }
-    
-      setTimeout(()=>{
-        toggleDepositModule()
-      },2000)
-     
+        setTimeout(() => {
+            toggleDepositModule();
+        }, 2000);
     };
-  
+
     return (
-        <Dialog open={depositModule} onOpenChange={toggleDepositModule}  >
+        <Dialog open={depositModule} onOpenChange={toggleDepositModule} >
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Deposit</DialogTitle>
@@ -67,20 +59,19 @@ const DepositMForm = () => {
                         />
                     </div>
                     <div className="flex flex-col gap-2">
-                        {phoneNumbers.map((number, index) => (
+                        {phoneNumbers?.map((numberObj, index) => (
                             <div
                                 key={index}
                                 className="p-2 border border-gray-300 rounded cursor-pointer hover:bg-gray-100 text-black dark:text-white"
-                                onClick={() => handleCopy(number)}
+                                onClick={() => handleCopy(numberObj.phoneNumber)}
                             >
-                                {number}
+                                {numberObj.phoneNumber}
                             </div>
                         ))}
                     </div>
                 </div>
             </DialogContent>
         </Dialog>
-
     )
 }
 
