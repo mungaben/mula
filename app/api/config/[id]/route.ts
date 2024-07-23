@@ -36,6 +36,9 @@ export async function PUT(req: NextRequest) {
   // const id = getIdFromRequest(req);
   const updatedData = await req.json();
 
+  console.log("updated",updatedData);
+  
+
   // if (!id) {
   //   return NextResponse.json({ error: 'ID is required' }, { status: 400 });
   // }

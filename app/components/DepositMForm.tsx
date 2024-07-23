@@ -14,18 +14,17 @@ import {
 } from "@/components/ui/dialog"
 import useModuleStore from '@/lib/storage/modules';
 import toast from 'react-hot-toast';
+import useFetch from '@/lib/useFetch';
 
 
+export type PhoneNumber = {
+    phoneNumber: string;
+  };
 
 
 const DepositMForm = () => {
 
-    const phoneNumbers = [
-        "(212) 555-0198",
-        "(310) 555-0147",
-        "(415) 555-0123",
-        "(617) 555-0182",
-      ];
+    const { data: phoneNumbers, error, isLoading } = useFetch<PhoneNumber[]>('/api/phonenumbers');
 
 
     const { depositModule, toggleDepositModule } = useModuleStore();

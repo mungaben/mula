@@ -7,6 +7,7 @@ export interface Config {
     level2Percentage: number;
     level3Percentage: number;
     linkLifetime: number;
+    initialBal:number;
     createdAt: Date;
     updatedAt: Date;
   }

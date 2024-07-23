@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
   }
 
-  const { minWithdrawalAmount, withdrawalFeePercentage, minBalance, level1Percentage, level2Percentage, level3Percentage, linkLifetime } = await req.json();
+  const { minWithdrawalAmount, initialBal, withdrawalFeePercentage, minBalance, level1Percentage, level2Percentage, level3Percentage, linkLifetime } = await req.json();
 
   try {
     const existingConfig = await prisma.config.findFirst();
@@ -44,6 +44,7 @@ export async function POST(req: NextRequest) {
         level1Percentage,
         level2Percentage,
         level3Percentage,
+        initialBal,
         linkLifetime,
       },
     });
@@ -75,11 +76,17 @@ export async function PUT(req: NextRequest) {
 
   const updatedData = await req.json();
 
+
+  console.log("data avail in cofig",updatedData);
+  
+
   try {
     const existingConfig = await prisma.config.findFirst();
     if (!existingConfig) {
       return NextResponse.json({ error: 'Configuration not found. Use POST to create.' }, { status: 404 });
     }
+
+
 
     const config = await prisma.config.update({
       where: { id: existingConfig.id },
@@ -91,6 +98,7 @@ export async function PUT(req: NextRequest) {
         level2Percentage: updatedData.level2Percentage,
         level3Percentage: updatedData.level3Percentage,
         linkLifetime: updatedData.linkLifetime,
+        initialBal:updatedData.initialBal,
         updatedAt: new Date(),
       },
     });
