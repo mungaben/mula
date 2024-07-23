@@ -27,6 +27,7 @@ const configSchema = z.object({
   level1Percentage: z.number().min(0).max(100, { message: 'Must be between 0 and 100' }),
   level2Percentage: z.number().min(0).max(100, { message: 'Must be between 0 and 100' }),
   level3Percentage: z.number().min(0).max(100, { message: 'Must be between 0 and 100' }),
+  initialBal: z.number().nonnegative({ message: 'Must be non-negative' }),
   linkLifetime: z.number().nonnegative({ message: 'Must be non-negative' }),
 });
 
@@ -37,6 +38,8 @@ interface ConfigFormProps {
 }
 
 export const ConfigForm: React.FC<ConfigFormProps> = ({ initialData }) => {
+  console.log("initialdaa",initialData);
+  
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -53,6 +56,7 @@ export const ConfigForm: React.FC<ConfigFormProps> = ({ initialData }) => {
     level1Percentage: 0,
     level2Percentage: 0,
     level3Percentage: 0,
+    initialBal:0,
     linkLifetime: 0,
   };
 
@@ -69,6 +73,9 @@ export const ConfigForm: React.FC<ConfigFormProps> = ({ initialData }) => {
       const method = initialData?.id ? 'PUT' : 'POST';
 
       console.log("method", method, data)
+
+      console.log("data",data);
+      
     //   const url = `/api/config${data.id ? `/${data.id}` : ''}`;
       const url="/api/config"
       const response = await fetch(url, {
@@ -146,6 +153,24 @@ export const ConfigForm: React.FC<ConfigFormProps> = ({ initialData }) => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Minimum Balance</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    {...field}
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                    disabled={loading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+            <FormField
+            control={form.control}
+            name='initialBal'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>initalbal Balance</FormLabel>
                 <FormControl>
                   <Input
                     type="number"

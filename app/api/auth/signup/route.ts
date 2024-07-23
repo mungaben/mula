@@ -48,12 +48,18 @@ export async function POST(req: NextRequest) {
     const baseReferralLink = name.replace(/\s+/g, '').toLowerCase();
     const referralLink = await generateUniqueReferralLink(baseReferralLink);
 
+    const config = await prisma.config.findFirst();
+    const initialBalance = config?.initialBal ?? 0;
+
+  
+
     const newUser = await prisma.user.create({
       data: {
         email,
         password: hashedPassword,
         phone,
         name,
+        balance: initialBalance, // Add initial balance here
         referralLink,
       },
     });

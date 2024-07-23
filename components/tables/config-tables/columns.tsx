@@ -22,6 +22,11 @@ export const columns: ColumnDef<Config>[] = [
     cell: info => `Ksh ${info.getValue() as number}`,
   },
   {
+    accessorKey: 'initialBal',
+    header: 'InitialBal',
+    cell: info => `Ksh ${info.getValue() as number}`,
+  },
+  {
     accessorKey: 'level1Percentage',
     header: 'Level 1 Percentage',
     cell: info => `${info.getValue() as number}%`,

@@ -65,6 +65,7 @@ model Config {
   level1Percentage        Float
   level2Percentage        Float
   level3Percentage        Float
+  initialBal              Float? @default(100)
   linkLifetime            Int // in days
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt
