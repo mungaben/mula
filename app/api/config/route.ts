@@ -1,23 +1,26 @@
 import { PrismaClient, UserRole } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from "next-auth/next"
+import { getServerSession } from "next-auth/next";
 import authOptions from '@/lib/configs/auth/authOptions';
-// Adjust the path to your authOptions file
 
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 async function isAdmin(req: NextRequest) {
   const session = await getServerSession(authOptions);
+  console.log("logs",session?.user);
+  
   if (!session) {
     return false;
   }
-  
-  // Fetch user from the database
+
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
   });
 
-  return user?.role ===UserRole.ADMIN;
+  console.log("user role",user?.role);
+  
+
+  return user?.role === UserRole.ADMIN;
 }
 
 export async function POST(req: NextRequest) {
@@ -78,11 +81,18 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: 'Configuration not found. Use POST to create.' }, { status: 404 });
     }
 
-    const data = { ...existingConfig, ...updatedData, updatedAt: new Date() };
-
     const config = await prisma.config.update({
       where: { id: existingConfig.id },
-      data,
+      data: {
+        minWithdrawalAmount: updatedData.minWithdrawalAmount,
+        withdrawalFeePercentage: updatedData.withdrawalFeePercentage,
+        minBalance: updatedData.minBalance,
+        level1Percentage: updatedData.level1Percentage,
+        level2Percentage: updatedData.level2Percentage,
+        level3Percentage: updatedData.level3Percentage,
+        linkLifetime: updatedData.linkLifetime,
+        updatedAt: new Date(),
+      },
     });
 
     return NextResponse.json(config, { status: 200 });

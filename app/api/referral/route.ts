@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { nanoid } from 'nanoid';
 
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export async function POST(req: NextRequest) {
   try {

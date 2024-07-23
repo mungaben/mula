@@ -13,10 +13,12 @@ export default function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
 
     const result = await signIn('credentials', {
       redirect: false,
@@ -24,10 +26,12 @@ export default function SignIn() {
       password,
     });
 
+    setLoading(false);
+
     if (result?.error) {
       setError(result.error);
     } else {
-      router.push('/dashboard'); // Redirect to dashboard after successful login
+      router.push('/'); // Redirect to dashboard after successful login
     }
   };
 
@@ -46,6 +50,7 @@ export default function SignIn() {
               onChange={(e) => setEmail(e.target.value)}
               className="mb-4"
               required
+              disabled={loading}
             />
             <Input
               type="password"
@@ -54,19 +59,17 @@ export default function SignIn() {
               onChange={(e) => setPassword(e.target.value)}
               className="mb-4"
               required
+              disabled={loading}
             />
           </CardContent>
-          <CardFooter className=' w-full flex justify-between' >
-            <Button type="submit" size="lg">
-              Sign In
+          <CardFooter className="w-full flex justify-between items-center">
+            <Button type="submit" size="lg" disabled={loading}>
+              {loading ? 'Loading...' : 'Sign In'}
             </Button>
-            <span>
-              or
-            </span>
-            <Button asChild variant={"link"}>
-  <Link href="/auth/signup">create account</Link>
-</Button>
-
+            <span>or</span>
+            <Button asChild variant="link" disabled={loading}>
+              <Link href="/auth/signup">Create account</Link>
+            </Button>
           </CardFooter>
         </form>
         {error && <div className="text-red-500 mt-2">{error}</div>}

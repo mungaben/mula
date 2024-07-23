@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 const getIdFromRequest = (req: NextRequest) => {
   const { pathname } = new URL(req.url!);

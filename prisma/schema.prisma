@@ -77,7 +77,6 @@ model SimPhoneNumber {
   createdAt        DateTime          @default(now())
   deposits         Deposit[]
   awaitingDeposits AwaitingDeposit[]
-  withdrawals      WithdrawalRequest[]
 }
 
 model Deposit {
@@ -94,13 +93,12 @@ model Deposit {
 model WithdrawalRequest {
   id               String           @id @default(auto()) @map("_id") @db.ObjectId
   userId           String           @db.ObjectId
-  simPhoneNumberId String           @db.ObjectId
   amount           Float
   status           WithdrawalStatus @default(REQUESTED)
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
   user             User             @relation(fields: [userId], references: [id])
-  simPhoneNumber   SimPhoneNumber   @relation(fields: [simPhoneNumberId], references: [id])
+ 
 }
 
 model Product {

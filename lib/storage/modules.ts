@@ -1,27 +1,25 @@
-import { create } from 'zustand';
-import { ModuleStore } from '../schemas';
- // Adjust the path to where your types are defined
+import {create} from 'zustand';
 
-const useModuleStore = create<ModuleStore>((set) => ({
-  depositModule: false,
-  toggleDepositModule: () => set((state) => ({
-    depositModule: !state.depositModule,
-  })),
+interface ModuleState {
+  redeemCodeModule: boolean;
+  depositModule: boolean;
+  withdrawModule: boolean;
+  referralLinkModule: boolean;
+  toggleRedeemCodeModule: () => void;
+  toggleDepositModule: () => void;
+  toggleWithdrawModule: () => void;
+  toggleReferralLinkModule: () => void;
+}
 
-  withdrawModule: false,
-  toggleWithdrawModule: () => set((state) => ({
-    withdrawModule: !state.withdrawModule,
-  })),
-
+const useModuleStore = create<ModuleState>((set) => ({
   redeemCodeModule: false,
-  toggleRedeemCodeModule: () => set((state) => ({
-    redeemCodeModule: !state.redeemCodeModule,
-  })),
-
+  depositModule: false,
+  withdrawModule: false,
   referralLinkModule: false,
-  toggleReferralLinkModule: () => set((state) => ({
-    referralLinkModule: !state.referralLinkModule,
-  })),
+  toggleRedeemCodeModule: () => set((state) => ({ redeemCodeModule: !state.redeemCodeModule })),
+  toggleDepositModule: () => set((state) => ({ depositModule: !state.depositModule })),
+  toggleWithdrawModule: () => set((state) => ({ withdrawModule: !state.withdrawModule })),
+  toggleReferralLinkModule: () => set((state) => ({ referralLinkModule: !state.referralLinkModule })),
 }));
 
 export default useModuleStore;

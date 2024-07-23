@@ -8,6 +8,10 @@ export const specialCodeSchema = z.object({
   userId: z.string().optional(),
 });
 
+export const specialCodeWithIdSchema = specialCodeSchema.extend({
+  id: z.string().optional(),
+});
+
 export const redeemCodeSchema = z.object({
   code: z.string(),
   userId: z.string(),

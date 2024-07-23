@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient, DepositStatus } from "@prisma/client";
 
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 type SmsBody = {
   from: string;

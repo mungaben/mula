@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import SpecialCodeLayout from './layout';
+
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -85,7 +85,7 @@ export function CreateSpecialCodePage() {
   }
 
   return (
-    <SpecialCodeLayout>
+    <>
       <h1>Create Special Code</h1>
       {message && <Alert>{message}</Alert>}
       <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -122,7 +122,7 @@ export function CreateSpecialCodePage() {
         </div>
         <Button type="submit">Create Special Code</Button>
       </form>
-    </SpecialCodeLayout>
+    </>
   );
 }
 

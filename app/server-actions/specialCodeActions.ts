@@ -2,11 +2,11 @@
 
 import { PrismaClient } from '@prisma/client';
 import { randomBytes } from 'crypto'; // Use crypto for generating unique codes
-import { specialCodeSchema, redeemCodeSchema } from '@/lib/schemas';
+import { specialCodeSchema, redeemCodeSchema, specialCodeWithIdSchema } from '@/lib/schemas';
 import { sendNotification } from '@/lib/notification';
 import { z } from 'zod';
 
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 // Generate a unique code using crypto
 export const generateUniqueCode = (): string => {
@@ -184,4 +184,71 @@ export const getActiveSpecialCodes = async () => {
 export const getAllSpecialCodes = async () => {
   const allSpecialCodes = await prisma.specialCode.findMany();
   return allSpecialCodes;
+};
+
+
+
+
+export const saveSpecialCode = async (data: z.infer<typeof specialCodeWithIdSchema>, method: 'POST' | 'PUT') => {
+  specialCodeWithIdSchema.parse(data);
+
+  const { id, totalAmount, redeemAmount, expiresAt, userId } = data;
+
+  if (method === 'POST') {
+    const code = generateUniqueCode();
+    console.log('Generated code:', code);
+    console.log('Data being passed to Prisma:', {
+      code,
+      totalAmount,
+      redeemAmount,
+      currentAmount: 0,
+      expiresAt,
+      userId,
+    });
+
+    const specialCode = await prisma.specialCode.create({
+      data: {
+        code,
+        totalAmount,
+        redeemAmount,
+        currentAmount: 0,
+        expiresAt,
+        userId,
+      },
+    });
+
+    if (!specialCode) {
+      throw new Error("Special code not created");
+    }
+
+    return specialCode;
+  } else if (method === 'PUT') {
+    if (!id) {
+      throw new Error("ID is required for updating a special code");
+    }
+
+    console.log('Data being passed to Prisma for update:', {
+      id,
+      totalAmount,
+      redeemAmount,
+      expiresAt,
+      userId,
+    });
+
+    const specialCode = await prisma.specialCode.update({
+      where: { id },
+      data: {
+        totalAmount,
+        redeemAmount,
+        expiresAt,
+        userId,
+      },
+    });
+
+    if (!specialCode) {
+      throw new Error("Special code not updated");
+    }
+
+    return specialCode;
+  }
 };
