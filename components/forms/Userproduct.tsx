@@ -22,6 +22,9 @@ import { useToast } from '../ui/use-toast';
 const productSchema = z.object({
   name: z.string().nonempty({ message: 'Name is required' }),
   price: z.number().nonnegative({ message: 'Price must be non-negative' }),
+  DaysToExpire: z.number().optional().refine((val) => val === undefined || val >= 0, {
+    message: 'Days to Expire must be non-negative',
+  }),
   earningPer24Hours: z.number().nonnegative({ message: 'Earnings per 24 hours must be non-negative' }),
   growthPercentage: z.number().optional().refine((val) => val === undefined || (val >= 0 && val <= 100), {
     message: 'Growth percentage must be between 0 and 100',
@@ -40,11 +43,17 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, productId
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
+
+  console.info("**************************************************************************");
+  console.info("*initial data **",initialData);
+  console.info("**************************************************************************");
+
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
     defaultValues: initialData || {
       name: '',
       price: 0,
+      DaysToExpire: undefined,
       earningPer24Hours: 0,
       growthPercentage: undefined,
     },
@@ -110,6 +119,24 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, productId
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Price</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    {...field}
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                    disabled={loading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="DaysToExpire"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Days to Expire</FormLabel>
                 <FormControl>
                   <Input
                     type="number"

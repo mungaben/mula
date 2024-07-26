@@ -14,6 +14,8 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsedBody = addPhoneNumberSchema.parse(body);
 
+    console.log("passeddata in numbers",parsedBody)
+
     const { phoneNumber, description } = parsedBody;
 
     // Check if the phone number already exists
@@ -49,18 +51,14 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const phoneNumber = searchParams.get('phoneNumber');
 
+
+
   if (!phoneNumber) {
     return NextResponse.json({ error: "Phone number is required" }, { status: 400 });
   }
 
   try {
-    const phoneDetails = await prisma.simPhoneNumber.findUnique({
-      where: { phoneNumber },
-      include: {
-        deposits: true,
-        awaitingDeposits: true,
-      },
-    });
+    const phoneDetails = await prisma.simPhoneNumber.findMany({})
 
     if (!phoneDetails) {
       return NextResponse.json({ error: "Phone number not found" }, { status: 404 });
@@ -85,6 +83,8 @@ export async function PUT(req: NextRequest) {
   try {
     const body = await req.json();
     const parsedBody = updatePhoneNumberSchema.parse(body);
+
+
 
     const { phoneNumber, description } = parsedBody;
 

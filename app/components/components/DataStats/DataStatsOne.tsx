@@ -1,8 +1,7 @@
-import useFetch from "@/lib/useFetch";
-import React from "react";
-import { dataStats } from "./datatypes";
-import Loader from "../common/Loader";
-
+import React from 'react';
+import useFetch from '@/lib/useFetch';
+import Loader from '../common/Loader';
+import { dataStats } from './datatypes';
 
 const icons = {
   balance: (
@@ -71,20 +70,8 @@ const icons = {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <ellipse
-        cx="9.75106"
-        cy="6.49984"
-        rx="4.33333"
-        ry="4.33333"
-        fill="white"
-      />
-      <ellipse
-        cx="9.75106"
-        cy="18.4178"
-        rx="7.58333"
-        ry="4.33333"
-        fill="white"
-      />
+      <ellipse cx="9.75106" cy="6.49984" rx="4.33333" ry="4.33333" fill="white" />
+      <ellipse cx="9.75106" cy="18.4178" rx="7.58333" ry="4.33333" fill="white" />
       <path
         d="M22.7496 18.4173C22.7496 20.2123 20.5445 21.6673 17.8521 21.6673C18.6453 20.8003 19.1907 19.712 19.1907 18.4189C19.1907 17.1242 18.644 16.0349 17.8493 15.1674C20.5417 15.1674 22.7496 16.6224 22.7496 18.4173Z"
         fill="white"
@@ -106,78 +93,80 @@ interface UserData {
   totalWithdrawals: number;
   totalInterest: number;
   totalReferrals: number;
+  totalProductPurchases: number;
 }
 
 const DataStatsOne: React.FC = () => {
-  const { data, error, isLoading } = useFetch<UserData>("/api/Users/Myuser");
+  const { data, error, isLoading } = useFetch<UserData>('/api/Users/Myuser');
 
   if (isLoading) {
-    return <Loader/>;
+    return <Loader />;
   }
 
   if (error) {
-    return ;
+    return <div>Error loading data.</div>;
   }
 
-  const dataStatsList: dataStats[] = data ? [
-    {
-      icon: icons.balance,
-      color: "#3FD97F",
-      title: "Balance",
-      value: `${data.balance.toFixed(2)}K`,
-      growthRate: 0.43, // Example growth rate
-    },
-    {
-      icon: icons.withdrawals,
-      color: "#FF9C55",
-      title: "Total Withdrawals",
-      value: `$${data.totalWithdrawals.toFixed(2)}K`,
-      growthRate: 4.35, // Example growth rate
-    },
-    {
-      icon: icons.deposits,
-      color: "#8155FF",
-      title: "Total Deposits",
-      value: `${data.totalDeposits.toFixed(2)}`,
-      growthRate: 2.59, // Example growth rate
-    },
-    {
-      icon: icons.commissions,
-      color: "#18BFFF",
-      title: "Total Commissions",
-      value: `${data.totalInterest.toFixed(2)}`,
-      growthRate: -0.95, // Example growth rate
-    }
-  ] : [];
+  const dataStatsList: dataStats[] = data
+    ? [
+        {
+          icon: icons.balance,
+          color: '#3FD97F',
+          title: 'Available Balance',
+          value: `$${data.balance.toFixed(2)}`,
+          growthRate: data.totalDeposits !== 0 ? (data.balance / data.totalDeposits) * 100 : 0,
+        },
+        {
+          icon: icons.withdrawals,
+          color: '#FF9C55',
+          title: 'Total Withdrawals',
+          value: `-$${data.totalWithdrawals.toFixed(2)}`,
+          growthRate: data.totalWithdrawals !== 0 ? (data.totalWithdrawals / data.totalDeposits) * 100 : 0,
+        },
+        {
+          icon: icons.deposits,
+          color: '#8155FF',
+          title: 'Total Deposits',
+          value: `$${data.totalDeposits.toFixed(2)}`,
+          growthRate: data.totalDeposits !== 0 ? (data.totalDeposits / (data.balance + data.totalProductPurchases + data.totalWithdrawals)) * 100 : 0,
+        },
+        {
+          icon: icons.commissions,
+          color: '#18BFFF',
+          title: 'Total Interest',
+          value: `$${data.totalInterest.toFixed(2)}`,
+          growthRate: data.totalInterest !== 0 ? (data.totalInterest / data.totalDeposits) * 100 : 0,
+        },
+        {
+          icon: icons.balance,
+          color: '#FF69B4',
+          title: 'Total Product Purchases',
+          value: `-$${data.totalProductPurchases.toFixed(2)}`,
+          growthRate: data.totalProductPurchases !== 0 ? (data.totalProductPurchases / data.totalDeposits) * 100 : 0,
+        },
+      ]
+    : [];
 
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6 xl:grid-cols-5 2xl:gap-7.5">
       {dataStatsList.map((item, index) => (
-        <div
-          key={index}
-          className="rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark"
-        >
-          <div
-            className="flex h-14.5 w-14.5 items-center justify-center rounded-full"
-            style={{ backgroundColor: item.color }}
-          >
+        <div key={index} className="rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark">
+          <div className="flex h-14.5 w-14.5 items-center justify-center rounded-full" style={{ backgroundColor: item.color }}>
             {item.icon}
           </div>
 
           <div className="mt-6 flex items-end justify-between">
             <div>
-              <h4 className="mb-1.5 text-heading-6 font-bold text-dark dark:text-white">
-                {item.value}
-              </h4>
+              <h4 className="mb-1.5 text-heading-6 font-bold text-dark dark:text-white">{item.value}</h4>
               <span className="text-body-sm font-medium">{item.title}</span>
             </div>
 
             <span
               className={`flex items-center gap-1.5 text-body-sm font-medium ${
-                item.growthRate > 0 ? "text-green" : "text-red"
+                item.growthRate > 0 ? 'text-green' : 'text-red'
               }`}
             >
-              {item.growthRate}%
+              {item.growthRate.toFixed(2)}%
               {item.growthRate > 0 ? (
                 <svg
                   className="fill-current"

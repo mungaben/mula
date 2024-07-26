@@ -14,7 +14,8 @@ type Product = {
   id: string;
   name: string;
   price: number;
-  earningPer24Hours: number;
+  DaysToExpire?: number;
+  earningPer24Hours?: number;
   growthPercentage: number;
   subscribersCount: number;
   createdAt: string;
@@ -32,9 +33,34 @@ export const columns: ColumnDef<Product>[] = [
     cell: info => `Ksh ${info.getValue() as number}`,
   },
   {
+    accessorKey: 'earningPer24Hours',
+    header: 'Earnings per 24 Hours',
+    cell: info => {
+      const product = info.row.original;
+      const dailyEarnings = product.earningPer24Hours ?? product.price * (product.growthPercentage / 100);
+      return `Ksh ${dailyEarnings.toFixed(2)}`;
+    },
+  },
+  {
     accessorKey: 'growthPercentage',
     header: 'Growth Percentage',
     cell: info => `${info.getValue() as number}%`,
+  },
+  {
+    accessorKey: 'DaysToExpire',
+    header: 'Days to Expire',
+    cell: info => `${info.getValue() ?? 'N/A'}`,
+  },
+  {
+    accessorKey: 'totalEarnings',
+    header: 'Total Earnings',
+    cell: info => {
+      const product = info.row.original;
+      const dailyEarnings = product.earningPer24Hours ?? product.price * (product.growthPercentage / 100);
+      const totalDays = product.DaysToExpire ?? 'N/A';
+      const totalEarnings = typeof totalDays === 'number' ? (dailyEarnings * totalDays).toFixed(2) : 'N/A';
+      return `Ksh ${totalEarnings}`;
+    },
   },
   {
     id: 'actions',
@@ -48,7 +74,7 @@ const ActionButtons = ({ productId }: { productId: string }) => {
   const router = useRouter();
   const { data, error, isLoading } = useFetch<{ isPurchased: boolean; hasEnoughBalance: boolean }>(`/api/products/${productId}/isPurchased`);
   const [buttonClicked, setButtonClicked] = useState(false);
-  const [belowbalance, setBelowBalance] = useState(false);
+  const [belowBalance, setBelowBalance] = useState(false);
 
   const handleBuyProduct = async () => {
     setButtonClicked(true);
@@ -74,7 +100,7 @@ const ActionButtons = ({ productId }: { productId: string }) => {
     }
 
     try {
-      const response = await fetch(`/api/products/${productId}/buy`, {
+      const response = await fetch(`/api/products/${productId}/Buy`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -96,7 +122,7 @@ const ActionButtons = ({ productId }: { productId: string }) => {
         title: 'Success!',
         description: 'Product purchased successfully.',
       });
-      router.push('/dashboard/Profile');
+      router.push('/');
     } catch (error) {
       console.error('Error buying product:', error);
       let errorMessage = 'An unexpected error occurred';
@@ -128,14 +154,14 @@ const ActionButtons = ({ productId }: { productId: string }) => {
       <Button
         className="text-green-500"
         onClick={handleBuyProduct}
-        disabled={isPurchased || buttonClicked || belowbalance}
+        disabled={isPurchased || buttonClicked || belowBalance}
       >
         {isPurchased ? 'Purchased' : 'Buy'}
       </Button>
-      {belowbalance && (
+      {belowBalance && (
         <Button
           className="text-blue-500"
-          onClick={() =>toggleDepositModule() }
+          onClick={() => toggleDepositModule()}
         >
           Add Balance
         </Button>

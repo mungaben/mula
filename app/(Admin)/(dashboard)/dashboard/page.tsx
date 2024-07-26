@@ -1,21 +1,56 @@
+
+
+"use client"
+import useSWR from 'swr';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { CalendarDateRangePicker } from '@/components/date-range-picker';
 import { AreaGraph } from '@/components/charts/area-graph';
 import { BarGraph } from '@/components/charts/bar-graph';
 import { PieGraph } from '@/components/charts/pie-graph';
-import { CalendarDateRangePicker } from '@/components/date-range-picker';
-import { Overview } from '@/components/overview';
 import { RecentSales } from '@/components/recent-sales';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import Loader from '@/app/components/components/common/Loader';
 
-export default function page() {
+const fetcher = async (url: string) => {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error('Failed to fetch data');
+  }
+  return response.json();
+};
+
+export default function Page() {
+  const { data, error } = useSWR('/api/dashboardfig', fetcher);
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const handleRunUpdate = async () => {
+    setIsUpdating(true);
+    try {
+      const response = await fetch('/api/manualUpdate', { method: 'POST' });
+      if (!response.ok) {
+        throw new Error('Failed to run manual update');
+      }
+      const result = await response.json();
+      toast.success(result.message);
+    } catch (error) {
+
+       if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error('An unknown error occurred');
+      }
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  if (error) return <div>Error loading data</div>;
+  if (!data) return <Loader/>;
+
   return (
     <ScrollArea className="h-full">
       <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
@@ -25,7 +60,9 @@ export default function page() {
           </h2>
           <div className="hidden items-center space-x-2 md:flex">
             <CalendarDateRangePicker />
-            <Button>Download</Button>
+            <Button onClick={handleRunUpdate} disabled={isUpdating}>
+              {isUpdating ? 'Running...' : 'Run interest'}
+            </Button>
           </div>
         </div>
         <Tabs defaultValue="overview" className="space-y-4">
@@ -42,23 +79,11 @@ export default function page() {
                   <CardTitle className="text-sm font-medium">
                     Total Revenue
                   </CardTitle>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    className="h-4 w-4 text-muted-foreground"
-                  >
-                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-                  </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">$45,231.89</div>
+                  <div className="text-2xl font-bold">${data.totalRevenue.amount.toFixed(2)}</div>
                   <p className="text-xs text-muted-foreground">
-                    +20.1% from last month
+                    {data.totalRevenue.change > 0 ? '+' : ''}{data.totalRevenue.change.toFixed(1)}% from yesterday
                   </p>
                 </CardContent>
               </Card>
@@ -67,75 +92,46 @@ export default function page() {
                   <CardTitle className="text-sm font-medium">
                     Subscriptions
                   </CardTitle>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    className="h-4 w-4 text-muted-foreground"
-                  >
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                    <circle cx="9" cy="7" r="4" />
-                    <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
-                  </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">+2350</div>
+                  <div className="text-2xl font-bold">+{data.totalSubscriptions.count}</div>
                   <p className="text-xs text-muted-foreground">
-                    +180.1% from last month
+                    {data.totalSubscriptions.change > 0 ? '+' : ''}{data.totalSubscriptions.change.toFixed(1)}% from yesterday
                   </p>
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Sales</CardTitle>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    className="h-4 w-4 text-muted-foreground"
-                  >
-                    <rect width="20" height="14" x="2" y="5" rx="2" />
-                    <path d="M2 10h20" />
-                  </svg>
+                  <CardTitle className="text-sm font-medium">New Users</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">+12,234</div>
+                  <div className="text-2xl font-bold">+{data.newUsers.count}</div>
                   <p className="text-xs text-muted-foreground">
-                    +19% from last month
+                    {data.newUsers.change > 0 ? '+' : ''}{data.newUsers.change.toFixed(1)}% from yesterday
                   </p>
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
-                    Active Now
+                    Total Interests
                   </CardTitle>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    className="h-4 w-4 text-muted-foreground"
-                  >
-                    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-                  </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">+573</div>
+                  <div className="text-2xl font-bold">+{data.totalInterests.amount.toFixed(2)}</div>
                   <p className="text-xs text-muted-foreground">
-                    +201 since last hour
+                    {data.totalInterests.change > 0 ? '+' : ''}{data.totalInterests.change.toFixed(1)}% from yesterday
                   </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    Total Balance
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">${data.totalBalance.toFixed(2)}</div>
                 </CardContent>
               </Card>
             </div>

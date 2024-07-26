@@ -49,9 +49,10 @@ export async function POST(req: NextRequest) {
     const referralLink = await generateUniqueReferralLink(baseReferralLink);
 
     const config = await prisma.config.findFirst();
-    const initialBalance = config?.initialBal ?? 0;
-
-  
+    if (!config) {
+      return NextResponse.json({ error: 'Configuration not found' }, { status: 500 });
+    }
+    const initialBalance = config.initialBal ?? 0;
 
     const newUser = await prisma.user.create({
       data: {
@@ -59,7 +60,7 @@ export async function POST(req: NextRequest) {
         password: hashedPassword,
         phone,
         name,
-        balance: initialBalance, // Add initial balance here
+        balance: initialBalance,
         referralLink,
       },
     });
@@ -74,23 +75,18 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Invalid referral link' }, { status: 400 });
       }
 
-      const config = await prisma.config.findFirst();
-      if (!config) {
-        return NextResponse.json({ error: 'Configuration not found' }, { status: 500 });
-      }
-
       const { level1Percentage, level2Percentage, level3Percentage, linkLifetime } = config;
-
-      const existingReferral = await prisma.referral.findFirst({
-        where: { refereeId: referrer.id },
-        orderBy: { createdAt: 'desc' }
-      });
 
       let level = 1;
       let percentage = level1Percentage;
 
-      if (existingReferral) {
-        level = existingReferral.level + 1;
+      const existingReferrals = await prisma.referral.findMany({
+        where: { refereeId: referrer.id },
+        orderBy: { createdAt: 'desc' }
+      });
+
+      if (existingReferrals.length > 0) {
+        level = existingReferrals.length + 1;
         percentage = level === 2 ? level2Percentage : level3Percentage;
       }
 
@@ -108,6 +104,17 @@ export async function POST(req: NextRequest) {
         where: { id: newUser.id },
         data: {
           referredBy: referrer.id,
+        },
+      });
+
+      // Create pending commission for the referrer without setting amount
+      await prisma.commission.create({
+        data: {
+          userId: newUser.id,
+          referrerId: referrer.id,
+          amount: 0, // Amount will be set later upon deposit
+          level,
+          pending: true,
         },
       });
     }
