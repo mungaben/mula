@@ -6,9 +6,14 @@ const secret = process.env.NEXTAUTH_SECRET;
 
 export default async function middleware(req: NextRequest) {
   // Define the paths that require authentication
-  const protectedPaths = ['/dashboard', '/user', '/profile', '/api/protected','/','/dashboad'];
+  const protectedPaths = ['/dashboard', '/user', '/profile', '/api/protected', '/', '/dashboard'];
 
   const path = req.nextUrl.pathname;
+
+  // Exclude the /api/Sms path from authentication
+  if (path.startsWith('/api/Sms')) {
+    return NextResponse.next();
+  }
 
   // Check if the path is one of the protected paths
   if (protectedPaths.some((protectedPath) => path.startsWith(protectedPath))) {
@@ -35,6 +40,6 @@ export const config = {
     '/profile/:path*',
     '/api/protected/:path*',
     '/api/Users',
-    '/'
+    '/',
   ],
 };

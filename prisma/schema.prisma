@@ -35,6 +35,38 @@ model User {
   createdAt           DateTime            @default(now())
   updatedAt           DateTime            @updatedAt
   referralLinksUsed   UserReferralLink[]
+  unsuccessfulDeposits UnsuccessfulDeposit[]
+  unsuccessfulWithdrawals UnsuccessfulWithdrawal[]
+}
+
+
+model LastRun {
+  id                      String              @id @default(auto()) @map("_id") @db.ObjectId
+  updatedAt               DateTime @default(now()) @updatedAt
+  runSource               String
+  accountsUpdated         Int
+  totalInterestAccumulated Float
+  totalBalances           Float
+  totalDeposits           Float
+  totalWithdrawals        Float
+}
+
+model UnsuccessfulDeposit {
+  id               String        @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String        @db.ObjectId
+  amount           Float
+  reason           String        // Reason for failure
+  createdAt        DateTime      @default(now())
+  user             User          @relation(fields: [userId], references: [id])
+}
+
+model UnsuccessfulWithdrawal {
+  id               String        @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String        @db.ObjectId
+  amount           Float
+  reason           String        // Reason for failure
+  createdAt        DateTime      @default(now())
+  user             User          @relation(fields: [userId], references: [id])
 }
 
 model Referral {
@@ -76,18 +108,14 @@ model SimPhoneNumber {
   phoneNumber      String            @unique
   description      String
   createdAt        DateTime          @default(now())
-  deposits         Deposit[]
-  awaitingDeposits AwaitingDeposit[]
 }
 
 model Deposit {
   id               String         @id @default(auto()) @map("_id") @db.ObjectId
   userId           String         @db.ObjectId
-  simPhoneNumberId String         @db.ObjectId
   amount           Float
   createdAt        DateTime       @default(now())
   user             User           @relation(fields: [userId], references: [id])
-  simPhoneNumber   SimPhoneNumber @relation(fields: [simPhoneNumberId], references: [id])
   status           DepositStatus  @default(PENDING)
 }
 
@@ -106,6 +134,7 @@ model Product {
   id                String        @id @default(auto()) @map("_id") @db.ObjectId
   name              String
   price             Float
+  DaysToExpire      Int?
   earningPer24Hours Float
   growthPercentage  Float // Added to store growth percentage
   subscribersCount  Int           @default(0)
@@ -115,13 +144,15 @@ model Product {
 }
 
 model UserProduct {
-  id        String     @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String     @db.ObjectId
-  productId String     @db.ObjectId
-  createdAt DateTime   @default(now())
-  user      User       @relation(fields: [userId], references: [id])
-  product   Product    @relation(fields: [productId], references: [id])
-  interests Interest[]
+  id              String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String     @db.ObjectId
+  productId       String     @db.ObjectId
+  createdAt       DateTime   @default(now())
+  daysRemaining   Int?       // Allow null values
+  interestAccrued Float      @default(0.0)
+  user            User       @relation(fields: [userId], references: [id])
+  product         Product    @relation(fields: [productId], references: [id])
+  interests       Interest[]
 }
 
 model PromotionCode {
@@ -190,12 +221,10 @@ model PromotionRequest {
 model AwaitingDeposit {
   id               String      @id @default(auto()) @map("_id") @db.ObjectId
   userId           String      @db.ObjectId
-  simPhoneNumberId String      @db.ObjectId
   amount           Float
   initiatedAt      DateTime    @default(now())
   status           DepositStatus @default(PENDING)
   user             User        @relation(fields: [userId], references: [id])
-  simPhoneNumber   SimPhoneNumber @relation(fields: [simPhoneNumberId], references: [id])
 }
 
 enum DepositStatus {

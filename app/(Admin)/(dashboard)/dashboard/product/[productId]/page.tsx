@@ -8,6 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import LoadingSpinner from '@/app/components/LoadingSpinner';
 import { ProductForm, ProductFormValues } from '@/components/forms/Userproduct';
 
+
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
   { title: 'Products', link: '/dashboard/product' },
@@ -16,8 +17,8 @@ const breadcrumbItems = [
 
 export default function Page() {
   const { productId } = useParams<{ productId: string }>();
-  console.log("product id",productId);
-  
+  console.log("product id", productId);
+
   const [productData, setProductData] = useState<ProductFormValues | undefined>(undefined);
   const [loading, setLoading] = useState(true);
 
@@ -27,6 +28,11 @@ export default function Page() {
         const response = await fetch(`/api/products/${productId}`);
         const result = await response.json();
         setProductData(result);
+
+        console.warn("**************************************************************************")
+        console.warn("result", result);
+        console.warn("**************************************************************************");
+
       } catch (error) {
         console.error('Error fetching product data:', error);
       } finally {

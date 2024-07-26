@@ -4,11 +4,8 @@ import { prisma } from "@/lib/prisma";
 
 
 
-// Create a withdrawal request
 export async function POST(req: NextRequest) {
   const { userId, amount } = await req.json();
-
-  console.log("userid",userId, amount )
 
   try {
     const user = await prisma.user.findUnique({
@@ -19,11 +16,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    // Check for existing withdrawal requests with status 'REQUESTED'
+    const existingRequest = await prisma.withdrawalRequest.findFirst({
+      where: {
+        userId,
+        status: 'REQUESTED',
+      },
+    });
 
-
-   
-
-   
+    if (existingRequest) {
+      return NextResponse.json({
+        error: `Existing withdrawal request found: Amount Ksh ${existingRequest.amount}, Requested at ${existingRequest.createdAt}`,
+      }, { status: 400 });
+    }
 
     const config = await prisma.config.findFirst();
 

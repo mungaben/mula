@@ -9,6 +9,7 @@ type Product = {
   id: string;
   name: string;
   price: number;
+  DaysToExpire?: number;
   earningPer24Hours: number;
   growthPercentage: number;
   subscribersCount: number;
@@ -25,6 +26,11 @@ export const columns: ColumnDef<Product>[] = [
     accessorKey: 'price',
     header: 'Price',
     cell: info => `Ksh ${info.getValue() as number}`,
+  },
+  {
+    accessorKey: 'DaysToExpire',
+    header: 'Days to Expire',
+    cell: info => `${info.getValue() ?? 'N/A'}`,
   },
   {
     accessorKey: 'earningPer24Hours',

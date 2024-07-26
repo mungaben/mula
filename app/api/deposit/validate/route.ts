@@ -45,7 +45,6 @@ export async function POST(req: NextRequest) {
     await prisma.deposit.create({
       data: {
         userId,
-        simPhoneNumberId: simPhoneNumber.id,
         amount,
       },
     });

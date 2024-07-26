@@ -3,9 +3,8 @@ import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import authOptions from '@/lib/configs/auth/authOptions';
 
+export const dynamic = 'force-dynamic';
 
-
-export const dynamic = "force-dynamic"
 export async function GET(req: NextRequest) {
   try {
     console.log('Fetching server session...');
@@ -28,6 +27,11 @@ export async function GET(req: NextRequest) {
         },
         interests: true,
         referrals: true,
+        products: {
+          include: {
+            product: true,
+          },
+        },
       },
     });
 
@@ -36,25 +40,35 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const totalDeposits = user.deposits.reduce((acc, deposit) => acc + deposit.amount, 0);
-    const totalWithdrawals = user.withdrawals.reduce((acc, withdrawal) => acc + withdrawal.amount, 0);
-    const totalInterest = user.interests.reduce((acc, interest) => acc + interest.amount, 0);
-    const totalReferrals = user.referrals.length; // Counting the number of referrals
+    // Fetch the initial balance from config
+    const config = await prisma.config.findFirst();
+    const initialBalance = config?.initialBal || 0;
 
-    // Add a check to ensure all string operations are performed safely
+    // Calculate totals
+    const totalDeposits = user.deposits.reduce((acc, deposit) => acc + (deposit.amount || 0), 0);
+    const totalWithdrawals = user.withdrawals.reduce((acc, withdrawal) => acc + (withdrawal.amount || 0), 0);
+    const totalInterest = user.interests.reduce((acc, interest) => acc + (interest.amount || 0), 0);
+    const totalReferrals = user.referrals.length;
+    const totalProductPurchases = user.products.reduce((acc, userProduct) => acc + (userProduct.product.price || 0), 0);
+
+    // Calculate available balance (free money)
+    const availableBalance = totalDeposits + totalInterest - totalWithdrawals - totalProductPurchases + initialBalance;
+
     const detailedUser = {
       id: user.id,
-      name: user.name || 'N/A', // Ensure name is not undefined
-      email: user.email || 'N/A', // Ensure email is not undefined
-      phone: user.phone || 'N/A', // Ensure phone is not undefined
-      balance: user.balance,
+      name: user.name || 'N/A',
+      email: user.email || 'N/A',
+      phone: user.phone || 'N/A',
+      balance: availableBalance,
       totalDeposits,
       totalWithdrawals,
       totalInterest,
       totalReferrals,
+      totalProductPurchases,
+      initialBalance, // Include initial balance for frontend use if needed
     };
 
-    console.log('Returning detailed user data.');
+    console.log('Returning detailed user data:', detailedUser);
     return NextResponse.json(detailedUser, { status: 200 });
   } catch (error) {
     console.error('Internal server error:', error);

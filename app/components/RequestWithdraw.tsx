@@ -76,7 +76,6 @@ export function RequestWithdraw({ user }: RequestWithdrawProps) {
         },
         body: JSON.stringify({
           userId: session.user.id,
-          simPhoneNumberId: phoneNumber || user?.phone || '',
           amount: parsedAmount,
         }),
       });
@@ -98,6 +97,12 @@ export function RequestWithdraw({ user }: RequestWithdrawProps) {
           title: 'Error',
           description: result.error || 'Failed to submit withdrawal request.',
         });
+        if (result.error.startsWith('Existing withdrawal request found')) {
+          tot({
+            title: 'Pending Request',
+            description: result.error,
+          });
+        }
       }
     } catch (err) {
       setError('An error occurred while submitting the withdrawal request.');

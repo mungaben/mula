@@ -3,14 +3,17 @@ import { PrismaClient } from "@prisma/client";
 import { z } from "zod";
 
 import { prisma } from '@/lib/prisma';
+import { warn } from "console";
 
 const productSchema = z.object({
   name: z.string(),
   price: z.number().positive(),
+  DaysToExpire: z.number().int().nonnegative().optional(),
   earningPer24Hours: z.number().positive(),
-  growthPercentage: z.number().positive(),
+  growthPercentage: z.number().positive().max(100),
   subscribersCount: z.number().int().nonnegative(),
 });
+
 // req: NextRequest,{ params }: { params: { id: string } }
 
 export async function GET(req: NextRequest,{params}:{params:{id:string}}) {
@@ -39,9 +42,17 @@ export async function POST(req: NextRequest,{params}:{params:{id:string}}) {
     const body = await req.json();
     const parsedBody = productSchema.parse(body);
 
+
+   console.warn("body",parsedBody);
+   
+    
+
     const newProduct = await prisma.product.create({
       data: parsedBody,
     });
+
+    console.warn("newproduct",newProduct);
+    
 
     return NextResponse.json(newProduct, { status: 201 });
   } catch (error) {
