@@ -148,10 +148,12 @@ model UserProduct {
   createdAt       DateTime   @default(now())
   daysRemaining   Int?       // Allow null values
   interestAccrued Float      @default(0.0)
+  status          UserProductStatus   @default(ACTIVE) // New field to track status
   user            User       @relation(fields: [userId], references: [id])
   product         Product    @relation(fields: [productId], references: [id])
   interests       Interest[]
 }
+
 
 model PromotionCode {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -254,4 +256,9 @@ enum NotificationType {
   WITHDRAWAL
   PURCHASE
   LOGIN
+}
+
+enum UserProductStatus{
+  EXPIRED
+  ACTIVE
 }

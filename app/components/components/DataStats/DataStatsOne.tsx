@@ -108,44 +108,48 @@ const DataStatsOne: React.FC = () => {
   }
 
   const dataStatsList: dataStats[] = data
-    ? [
-        {
-          icon: icons.balance,
-          color: '#3FD97F',
-          title: 'Available Balance',
-          value: `$${data.balance.toFixed(2)}`,
-          growthRate: data.totalDeposits !== 0 ? (data.balance / data.totalDeposits) * 100 : 0,
-        },
-        {
-          icon: icons.withdrawals,
-          color: '#FF9C55',
-          title: 'Total Withdrawals',
-          value: `-$${data.totalWithdrawals.toFixed(2)}`,
-          growthRate: data.totalWithdrawals !== 0 ? (data.totalWithdrawals / data.totalDeposits) * 100 : 0,
-        },
-        {
-          icon: icons.deposits,
-          color: '#8155FF',
-          title: 'Total Deposits',
-          value: `$${data.totalDeposits.toFixed(2)}`,
-          growthRate: data.totalDeposits !== 0 ? (data.totalDeposits / (data.balance + data.totalProductPurchases + data.totalWithdrawals)) * 100 : 0,
-        },
-        {
-          icon: icons.commissions,
-          color: '#18BFFF',
-          title: 'Total Interest',
-          value: `$${data.totalInterest.toFixed(2)}`,
-          growthRate: data.totalInterest !== 0 ? (data.totalInterest / data.totalDeposits) * 100 : 0,
-        },
-        {
-          icon: icons.balance,
-          color: '#FF69B4',
-          title: 'Total Product Purchases',
-          value: `-$${data.totalProductPurchases.toFixed(2)}`,
-          growthRate: data.totalProductPurchases !== 0 ? (data.totalProductPurchases / data.totalDeposits) * 100 : 0,
-        },
-      ]
-    : [];
+  ? [
+      {
+        icon: icons.balance,
+        color: '#3FD97F',
+        title: 'Balance',
+        value: `$${data.balance.toFixed(2)}`,
+        growthRate: data.totalDeposits !== 0 ? (data.balance / data.totalDeposits) * 100 : 0,
+      },
+      {
+        icon: icons.withdrawals,
+        color: '#FF9C55',
+        title: 'Withdrawals',
+        value: `-$${data.totalWithdrawals.toFixed(2)}`,
+        growthRate: data.totalDeposits !== 0 ? (data.totalWithdrawals / data.totalDeposits) * 100 : 0,
+      },
+      {
+        icon: icons.deposits,
+        color: '#8155FF',
+        title: 'Deposits',
+        value: `$${data.totalDeposits.toFixed(2)}`,
+        growthRate:
+          data.balance + data.totalProductPurchases + data.totalWithdrawals !== 0
+            ? (data.totalDeposits / (data.balance + data.totalProductPurchases + data.totalWithdrawals)) * 100
+            : 0,
+      },
+      {
+        icon: icons.commissions,
+        color: '#18BFFF',
+        title: 'Interest',
+        value: `$${data.totalInterest.toFixed(2)}`,
+        growthRate: data.totalDeposits !== 0 ? (data.totalInterest / data.totalDeposits) * 100 : 0,
+      },
+      {
+        icon: icons.balance,
+        color: '#FF69B4',
+        title: 'Purchases',
+        value: `-$${data.totalProductPurchases.toFixed(2)}`,
+        growthRate: data.totalDeposits !== 0 ? (data.totalProductPurchases / data.totalDeposits) * 100 : 0,
+      },
+    ]
+  : [];
+
 
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6 xl:grid-cols-5 2xl:gap-7.5">
@@ -162,7 +166,7 @@ const DataStatsOne: React.FC = () => {
             </div>
 
             <span
-              className={`flex items-center gap-1.5 text-body-sm font-medium ${
+              className={`flex items-center gap-1.5 text-body-sm font-medium  ${
                 item.growthRate > 0 ? 'text-green' : 'text-red'
               }`}
             >

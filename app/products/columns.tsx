@@ -37,7 +37,9 @@ export const columns: ColumnDef<Product>[] = [
     header: 'Earnings per 24 Hours',
     cell: info => {
       const product = info.row.original;
-      const dailyEarnings = product.earningPer24Hours ?? product.price * (product.growthPercentage / 100);
+      const dailyEarnings =
+        product.earningPer24Hours ??
+        product.price * (product.growthPercentage / 100);
       return `Ksh ${dailyEarnings.toFixed(2)}`;
     },
   },
@@ -56,9 +58,14 @@ export const columns: ColumnDef<Product>[] = [
     header: 'Total Earnings',
     cell: info => {
       const product = info.row.original;
-      const dailyEarnings = product.earningPer24Hours ?? product.price * (product.growthPercentage / 100);
+      const dailyEarnings =
+        product.earningPer24Hours ??
+        product.price * (product.growthPercentage / 100);
       const totalDays = product.DaysToExpire ?? 'N/A';
-      const totalEarnings = typeof totalDays === 'number' ? (dailyEarnings * totalDays).toFixed(2) : 'N/A';
+      const totalEarnings =
+        typeof totalDays === 'number'
+          ? (dailyEarnings * totalDays).toFixed(2)
+          : 'N/A';
       return `Ksh ${totalEarnings}`;
     },
   },
@@ -72,7 +79,14 @@ export const columns: ColumnDef<Product>[] = [
 const ActionButtons = ({ productId }: { productId: string }) => {
   const { depositModule, toggleDepositModule } = useModuleStore();
   const router = useRouter();
-  const { data, error, isLoading } = useFetch<{ isPurchased: boolean; hasEnoughBalance: boolean }>(`/api/products/${productId}/isPurchased`);
+
+  // Fetch purchase and balance status
+  const { data, error, isLoading } = useFetch<{
+    isPurchased: boolean;
+    hasEnoughBalance: boolean;
+    isExpired: boolean; // Added to determine if product is expired
+  }>(`/api/products/${productId}/isPurchased`);
+
   const [buttonClicked, setButtonClicked] = useState(false);
   const [belowBalance, setBelowBalance] = useState(false);
 
@@ -92,7 +106,8 @@ const ActionButtons = ({ productId }: { productId: string }) => {
     if (!data?.hasEnoughBalance) {
       toast({
         title: 'Insufficient Balance',
-        description: 'You do not have enough balance to buy this product. Please add balance to proceed.',
+        description:
+          'You do not have enough balance to buy this product. Please add balance to proceed.',
       });
       setBelowBalance(true);
       setButtonClicked(false);
@@ -122,6 +137,8 @@ const ActionButtons = ({ productId }: { productId: string }) => {
         title: 'Success!',
         description: 'Product purchased successfully.',
       });
+
+      // Redirect to the homepage or refresh the page
       router.push('/');
     } catch (error) {
       console.error('Error buying product:', error);
@@ -140,29 +157,35 @@ const ActionButtons = ({ productId }: { productId: string }) => {
   };
 
   if (isLoading) {
-    return <Button className="text-green-500" disabled>Loading...</Button>;
+    return (
+      <Button className="text-green-500" disabled>
+        Loading...
+      </Button>
+    );
   }
 
   if (error) {
-    return <Button className="text-red-500" disabled>Error</Button>;
+    return (
+      <Button className="text-red-500" disabled>
+        Error
+      </Button>
+    );
   }
 
   const isPurchased = data?.isPurchased ?? false;
+  const isExpired = data?.isExpired ?? false;
 
   return (
     <div className="flex space-x-2">
       <Button
-        className="text-green-500"
+        className={`text-${isPurchased && !isExpired ? 'gray' : 'green'}-500`}
         onClick={handleBuyProduct}
-        disabled={isPurchased || buttonClicked || belowBalance}
+        disabled={(isPurchased && !isExpired) || buttonClicked || belowBalance}
       >
-        {isPurchased ? 'Purchased' : 'Buy'}
+        {isPurchased && !isExpired ? 'Purchased' : 'Buy'}
       </Button>
       {belowBalance && (
-        <Button
-          className="text-blue-500"
-          onClick={() => toggleDepositModule()}
-        >
+        <Button className="text-blue-500" onClick={() => toggleDepositModule()}>
           Add Balance
         </Button>
       )}

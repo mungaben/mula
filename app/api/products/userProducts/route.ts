@@ -12,14 +12,15 @@ export async function GET(req: NextRequest, res: NextResponse) {
     if (session) {
       const userId = session.user.id;
 
-      const purchasedProducts = await prisma.userProduct.findMany({
-        where: { userId },
-        include: { product: true },
-      });
+      const purchasedProducts = await prisma.product.findMany({})
 
-      const products = purchasedProducts.map(p => p.product).filter(product => product.name !== null);
 
-      return NextResponse.json(products);
+      console.log("purchased products",purchasedProducts );
+      
+
+      
+ 
+      return NextResponse.json(purchasedProducts);
     } else {
       const products = await prisma.product.findMany({
         where: {
@@ -28,6 +29,9 @@ export async function GET(req: NextRequest, res: NextResponse) {
           },
         },
       });
+
+      console.log("products",products );
+      
 
       if (!products.length) {
         return NextResponse.json({ error: "No products available" }, { status: 404 });
