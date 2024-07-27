@@ -99,9 +99,9 @@ export async function PUT(req: NextRequest,{params}:{params:{id:string}}) {
   }
 }
 
-export async function DELETE(req: NextRequest) {
+export async function DELETE(req: NextRequest,{params}:{params:{id:string}}) {
   const { searchParams } = new URL(req.url);
-  const id = searchParams.get('id');
+  const id = params.id;
 
   if (!id) {
     return NextResponse.json({ error: "No id passed in params" }, { status: 404 });

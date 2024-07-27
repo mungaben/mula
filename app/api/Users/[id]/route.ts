@@ -101,9 +101,9 @@ export async function PUT(req: NextRequest,{ params }: { params: { id: string } 
   }
 }
 
-export async function DELETE(req: NextRequest) {
+export async function DELETE(req: NextRequest,{params}:{params:{id:string}}) {
   const { searchParams } = new URL(req.url!);
-  const userId = searchParams.get('id');
+  const userId = params.id;
 
   if (!userId) {
     return NextResponse.json({ error: 'User ID is required' }, { status: 400 });

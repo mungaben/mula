@@ -1,13 +1,13 @@
-// app/middleware.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
 const secret = process.env.NEXTAUTH_SECRET;
 
-export default async function middleware(req: NextRequest) {
-  // Define the paths that require authentication
-  const protectedPaths = ['/dashboard', '/user', '/profile', '/api/protected', '/', '/dashboard'];
+// List of admin users
+const adminEmails = ['mungaben21@gmail.com', 'BUMGARDNERSHN@outlook.com', 'AMA@outlook.com'];
 
+export default async function middleware(req: NextRequest) {
+  const protectedPaths = ['/dashboard', '/user', '/profile', '/api/protected', '/', '/dashboard'];
   const path = req.nextUrl.pathname;
 
   // Exclude the /api/Sms path from authentication
@@ -26,6 +26,12 @@ export default async function middleware(req: NextRequest) {
       signInUrl.searchParams.set('callbackUrl', req.url);
       return NextResponse.redirect(signInUrl);
     }
+
+    // Check if the request method is DELETE and if the user is an admin
+    if (req.method === 'DELETE' && !adminEmails.includes(token.email)) {
+      // If not an admin, respond with a 403 Forbidden status
+      return new NextResponse('Forbidden', { status: 403 });
+    }
   }
 
   // Allow the request to proceed if authenticated or if the path is not protected
@@ -41,5 +47,6 @@ export const config = {
     '/api/protected/:path*',
     '/api/Users',
     '/',
+    '/api'
   ],
 };

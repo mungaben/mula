@@ -1,6 +1,5 @@
-// /products/index.ts
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth/next';
 import authOptions from '@/lib/configs/auth/authOptions';
 
@@ -13,17 +12,22 @@ export async function GET(req: NextRequest, res: NextResponse) {
     if (session) {
       const userId = session.user.id;
 
-      // const purchasedProducts = await prisma.userProduct.findMany({
-      //   where: { userId },
-      //   include: { product: true }
-      // });
+      const purchasedProducts = await prisma.userProduct.findMany({
+        where: { userId },
+        include: { product: true },
+      });
 
-      // const products = purchasedProducts.map(p => p.product);
-      const products = await prisma.product.findMany();
+      const products = purchasedProducts.map(p => p.product).filter(product => product.name !== null);
 
       return NextResponse.json(products);
     } else {
-      const products = await prisma.product.findMany();
+      const products = await prisma.product.findMany({
+        where: {
+          name: {
+            not: null,
+          },
+        },
+      });
 
       if (!products.length) {
         return NextResponse.json({ error: "No products available" }, { status: 404 });
