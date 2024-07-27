@@ -80,7 +80,7 @@ const TableOne: React.FC = () => {
           >
             <div className="flex items-center gap-3.5 px-2 py-4">
               <div className="flex-shrink-0">
-                <Image src="/images/brand/brand-04.svg" alt={product.name} width={48} height={48} />
+                <Image src="/images/brand/brand-04.svg" alt={product?.name||"product name"} width={48} height={48} />
               </div>
               <p className="hidden font-medium text-dark dark:text-white sm:block">
                 {product.name}

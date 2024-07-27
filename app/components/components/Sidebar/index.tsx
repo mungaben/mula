@@ -195,7 +195,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         />
                       </svg>
                     ),
-                    label: "eCommerce",
+                    label: "TikEarn Company",
                     route: "/",
                   }}
                   pageName={pageName}

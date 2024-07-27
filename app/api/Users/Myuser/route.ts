@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
       name: user.name || 'N/A',
       email: user.email || 'N/A',
       phone: user.phone || 'N/A',
-      balance: availableBalance,
+      balance: user.balance,
       totalDeposits,
       totalWithdrawals,
       totalInterest,

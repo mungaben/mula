@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev & node cron.js",
+    "dev": "next dev",
     "build": "next build",
     "postinstall": "prisma generate",
-    "start": "node cron.js & next start",
+    "seed": "node seed.js",
+    "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
@@ -92,7 +93,7 @@
     "postcss": "^8.4.39",
     "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.5",
-    "prisma": "^5.16.1",
+    "prisma": "^5.17.0",
     "tailwindcss": "^3.4.6",
     "typescript": "^5.5.3"
   }

@@ -26,6 +26,10 @@ export async function GET(req: NextRequest) {
       },
     });
 
+
+
+    console.warn("users from users",users)
+
     const detailedUsers = users.map(user => {
       const totalDeposits = user.deposits.reduce((acc, deposit) => acc + deposit.amount, 0);
       const totalWithdrawals = user.withdrawals.reduce((acc, withdrawal) => acc + withdrawal.amount, 0);
@@ -42,6 +46,9 @@ export async function GET(req: NextRequest) {
         totalCommissionsGiven,
       };
     });
+
+
+    console.info("detaileduers",detailedUsers)
 
     return NextResponse.json(detailedUsers, { status: 200 });
   } catch (error) {

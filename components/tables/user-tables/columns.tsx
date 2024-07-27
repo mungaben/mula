@@ -2,6 +2,12 @@ import { ColumnDef } from '@tanstack/react-table';
 import { User } from './client';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { toast } from '@/components/ui/use-toast';
+
+import React,{useState} from 'react'
+
+
+
 
 export const columns: ColumnDef<User>[] = [
   {
@@ -98,35 +104,64 @@ export const columns: ColumnDef<User>[] = [
 
 const ActionButtons = ({ userId }: { userId: string }) => {
   const router = useRouter();
+  const [isEditing, setIsEditing] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleEdit = () => {
+    setIsEditing(true);
     router.push(`/dashboard/user/${userId}`);
+    setIsEditing(false);
   };
 
   const handleDelete = async () => {
+    setIsDeleting(true);
     try {
-      const response = await fetch(`/api/users/${userId}`, {
+      const response = await fetch(`/api/Users/${userId}`, {
         method: 'DELETE',
       });
 
       if (!response.ok) {
-        throw new Error('Failed to delete user');
+        toast({
+          title:"Error!",
+          description:"Error Deleting"
+        });
       }
 
+      toast({
+        title:"sucess!",
+        description:"success deletion"
+      });
       // Optionally, you can refresh the page or remove the user from the table
       router.refresh();
     } catch (error) {
-      console.error('Error deleting user:', error);
+       if(error instanceof Error){
+        toast({
+          title:"Error!",
+          description:error.message
+        });
+        toast({
+          title:"Error!",
+          description:"Error Deletion"
+        });
+        
+       }
+    } finally {
+      setIsDeleting(false);
     }
   };
 
   return (
     <div className="flex space-x-2">
-      <Button className="text-blue-500" onClick={handleEdit}>
-        Edit
+      <Button className="text-blue-500" onClick={handleEdit} disabled={isEditing}>
+        {isEditing ? 'Editing...' : 'Edit'}
       </Button>
-      <Button className="text-red-200" variant={"destructive"} onClick={handleDelete}>
-        Delete
+      <Button
+        className="text-red-200"
+        variant="destructive"
+        onClick={handleDelete}
+        disabled={isDeleting}
+      >
+        {isDeleting ? 'Deleting...' : 'Delete'}
       </Button>
     </div>
   );
