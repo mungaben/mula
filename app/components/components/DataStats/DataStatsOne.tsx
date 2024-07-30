@@ -140,19 +140,13 @@ const DataStatsOne: React.FC = () => {
         value: `$${data.totalInterest.toFixed(2)}`,
         growthRate: data.totalDeposits !== 0 ? (data.totalInterest / data.totalDeposits) * 100 : 0,
       },
-      {
-        icon: icons.balance,
-        color: '#FF69B4',
-        title: 'Purchases',
-        value: `-$${data.totalProductPurchases.toFixed(2)}`,
-        growthRate: data.totalDeposits !== 0 ? (data.totalProductPurchases / data.totalDeposits) * 100 : 0,
-      },
+
     ]
   : [];
 
 
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6 xl:grid-cols-5 2xl:gap-7.5">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-4 md:gap-6 xl:grid-cols-5 2xl:gap-7.5">
       {dataStatsList.map((item, index) => (
         <div key={index} className="rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark">
           <div className="flex h-14.5 w-14.5 items-center justify-center rounded-full" style={{ backgroundColor: item.color }}>

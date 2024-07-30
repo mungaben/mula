@@ -14,7 +14,7 @@ const signUpSchema = z.object({
   name: z.string().max(50).nonempty({ message: 'Name is required' }),
   email: z.string().email({ message: 'Invalid email address' }),
   password: z.string().min(6, { message: 'Password must be at least 6 characters long' }),
-  phone: z.string().regex(/^\d{10,15}$/, { message: 'Phone number must be between 10 and 15 digits' }),
+  phone: z.string().regex(/^\d{8,15}$/, { message: 'Phone number must be between 9 and 15 digits' }),
   usedReferralLink: z.string().optional(),
 });
 

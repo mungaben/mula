@@ -57,19 +57,23 @@ export default function Page() {
         <div className="flex items-center justify-between space-y-2">
           <h2 className="text-3xl font-bold tracking-tight">
             Hi, Welcome back 👋
+           
           </h2>
           <div className="hidden items-center space-x-2 md:flex">
             <CalendarDateRangePicker />
-            <Button onClick={handleRunUpdate} disabled={isUpdating}>
+           
+          </div>
+          <Button onClick={handleRunUpdate} disabled={isUpdating}>
               {isUpdating ? 'Running...' : 'Run interest'}
             </Button>
-          </div>
         </div>
         <Tabs defaultValue="overview" className="space-y-4">
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="analytics" disabled>
-              Analytics
+            <Button onClick={handleRunUpdate} disabled={isUpdating}>
+              {isUpdating ? 'Running...' : 'Run interest'}
+            </Button>
             </TabsTrigger>
           </TabsList>
           <TabsContent value="overview" className="space-y-4">
