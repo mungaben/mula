@@ -17,7 +17,8 @@ type SmsBody = {
  * @returns An object containing the type, name, phone number, and amount extracted from the message.
  **/
 const extractDetails = (text: string) => {
-  const receivedRegex = /You have received Ksh(\d+\.\d{2}) from (.+) (\d{10}) on/;
+  const receivedRegex = /You have received Ksh (\d+\.\d{2}) from (?:MPESA - )?([A-Z\s]+) (\d{12})\. TID:/i;
+
   // const sentRegex = /Ksh (\d+\.\d{2}) SENT to (.+) (\d+) on/;
   const sentRegex = /Ksh(\d+\.\d{2})\s+sent\s+to\s+([A-Z\s]+)\s+(\d{10})/i;
 
@@ -148,7 +149,7 @@ export async function POST(req: NextRequest) {
 
 
   // Check if the message is from the correct sender
-  if (from !== 'MPESA') {
+  if (from !== 'airtelmoney') {
     console.log("Invalid sender");
     return NextResponse.json({ error: "Invalid sender" }, { status: 400 });
   }
@@ -185,10 +186,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Failed to extract amount" }, { status: 400 });
   }
 
-  try {
-    const user = await prisma.user.findUnique({
-      where: { phone: phoneNumber },
-    });
+   // Normalize the phone number by replacing '254' with '0' if it starts with '254'
+   const normalizedPhoneNumber = phoneNumber.startsWith('254') ? phoneNumber.replace('254', '0') : phoneNumber;
+
+   try {
+     const user = await prisma.user.findUnique({
+       where: { phone: normalizedPhoneNumber },
+     });
+
+
+
+     
 
     if (!user) {
       console.log("User not found");
