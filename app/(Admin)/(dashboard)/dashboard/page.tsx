@@ -63,6 +63,9 @@ export default function Page() {
             <CalendarDateRangePicker />
            
           </div>
+          <Button onClick={handleRunUpdate} disabled={isUpdating}>
+              {isUpdating ? 'Running...' : 'Run interest'}
+            </Button>
         </div>
         <Tabs defaultValue="overview" className="space-y-4">
           <TabsList>
